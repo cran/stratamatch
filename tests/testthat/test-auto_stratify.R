@@ -73,10 +73,6 @@ test_that("auto_stratify errors work", {
   # bad prognostic formula
   expect_error(auto_stratify(test_dat,
                              treat = "treated",
-                             prognosis = outcomes ~ socks),
-               "not all variables in prognosis formula appear in data")
-  expect_error(auto_stratify(test_dat,
-                             treat = "treated",
                              prognosis = treated ~ X1),
                "prognostic formula must model outcome, not treatment")
   expect_error(auto_stratify(test_dat,
@@ -88,6 +84,15 @@ test_that("auto_stratify errors work", {
                              treat = "treated",
                              prognosis = outcomes ~ X1 + treated),
                "prognostic formula must model the outcome in the absence of treatment; the treatment assignment may not be a predictor for the prognostic score model")
+  
+  # check that this runs without throwing an error
+  smalldata <- dplyr::select(test_dat, X1, outcomes, treated)
+  expect_error(auto_stratify(smalldata,
+                             treat = "treated",
+                             prognosis = outcomes ~ . - treated, 
+                             pilot_fraction = 0.2, # way too large in practice
+                             size = 25),
+               NA)
   
   # bad prognostic model
   expect_error(auto_stratify(test_dat,
@@ -119,11 +124,6 @@ test_that("auto_stratify errors work", {
                              prognosis = outcomes ~ X1,
                              pilot_sample = -1),
                "pilot_sample must be a data.frame")
-  expect_error(auto_stratify(test_dat,
-                             treat = "treated",
-                             prognosis = outcomes ~ X1,
-                             pilot_sample = dplyr::select(test_dat, -X1)),
-               "All variables in prognostic score formula must be in pilot set")
   
   # bad outcome format
   test_dat$outcome_12 <- test_dat$outcomes + 1
@@ -274,7 +274,9 @@ test_that("auto_stratify with prognostic formula + pilot_sample works", {
 
 test_that("auto_stratify with prognostic model works", {
 
-  progmod <- glm(outcomes ~ X1, test_dat, family = "binomial")
+  # use "." syntax in formula to check that this is allowed
+  progmod <- glm(outcomes ~ X1,
+                 test_dat, family = "binomial")
 
   a.strat <- auto_stratify(test_dat,
                            treat = "treated",

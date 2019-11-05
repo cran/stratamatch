@@ -1,7 +1,7 @@
-99d97b927fd1b381dbe254ebf55e33be *DESCRIPTION
+4ebd383da825d3c72b672800d82dde77 *DESCRIPTION
 7d48114b50ad47648e4e53456384122e *NAMESPACE
-bc1fd22bdb53516f37694cef2eea4765 *R/S3_methods.R
-d3c7d6e17b4f9ec0f4d96f573c5677c2 *R/auto_stratify.R
+748dd288fbe0e9647b2b6c11aaef477f *R/S3_methods.R
+98f9f185d22f7f5aac6bbd3fba6795d9 *R/auto_stratify.R
 dc95abe4fc6ce71292eaf0dc9090fc53 *R/imported_functions.R
 3d75ed1ff9655697de92886078e56c99 *R/make_issue_table.R
 c31ff538472e945a945034d7695ff7a3 *R/make_sample_data.R
@@ -9,11 +9,11 @@ c31ff538472e945a945034d7695ff7a3 *R/make_sample_data.R
 db0910befa19487ac6496ad648e7a999 *R/match_functions.R
 e9b4832a3fb0f453c99ed4db46c677fb *R/strata_object_constructors.R
 7eaab04e0c03e043a9e70fe0a54b912f *R/stratamatch.R
-a407ae34efec4506dd650853bd86143a *README.md
+82cb6683155f64579985240882280e53 *README.md
 e6bb4bf1e18155cc46493a27a3181b10 *build/vignette.rds
 8ac9b0061fdd8562268c8001088b4908 *inst/doc/Intro_to_stratamatch.R
 65190f741cf3386e0f52eeaa19e24b90 *inst/doc/Intro_to_stratamatch.Rmd
-10a158fe0ae3a9846b1f6d247d919d5b *inst/doc/Intro_to_stratamatch.html
+b655076269776a3ed33b6a911a37f127 *inst/doc/Intro_to_stratamatch.html
 c15b5fa98b8abaa26cb184e31823d2f0 *man/auto_stratify.Rd
 1845101a4c0a34e525cbcdf0959cca19 *man/build_prognostic_scores.Rd
 62ac5de7054f80cff5d805be9a4e9cda *man/check_inputs_auto_stratify.Rd
@@ -55,9 +55,9 @@ c2ac9dcf3200c541886e7d7cd895d0c2 *man/strata_match.Rd
 518e57db45f736033124c593f8816ee8 *tests/testthat.R
 0f7e0946110ff082c816805b602884aa *tests/testthat/ref_astrat_print
 faefb9c3c68a11ac5d826d04f12ba505 *tests/testthat/ref_mstrat_print
-1a4a1bd5c745051ff7031c35c189997c *tests/testthat/test-S3_functions.R
-f6d5776630cad335ac9df299a6425427 *tests/testthat/test-auto_stratify.R
+df649cb4a7453143e8109e870a4426fe *tests/testthat/test-S3_functions.R
+ba899e2ab5a82702f8c4778facb6f309 *tests/testthat/test-auto_stratify.R
 3446277620e633be931e9ba9f81aa749 *tests/testthat/test-manual_stratify.R
-c479cf232e88b6300b3babac4628816b *tests/testthat/test-match_functions.R
+16fb2f0ec90edde04c27f9f001757ed2 *tests/testthat/test-match_functions.R
 c7b3a88e111fcb636a3185f30d0a5d26 *tests/testthat/test_data.csv
 65190f741cf3386e0f52eeaa19e24b90 *vignettes/Intro_to_stratamatch.Rmd
