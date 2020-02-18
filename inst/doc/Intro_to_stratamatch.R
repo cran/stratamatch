@@ -18,6 +18,8 @@ m.strat <- manual_stratify(data = dat, treat ~ B1 + B2 + C1)
 # try printing the result
 m.strat
 
+summary(m.strat)
+
 ## ------------------------------------------------------------------------
 # show the first few rows of the stratified data set
 head(m.strat$analysis_set)
@@ -26,8 +28,10 @@ head(m.strat$analysis_set)
 a.strat <- auto_stratify(dat, treat = "treat", prognosis = outcome ~ X1 + X2,
                          pilot_fraction = 0.1, size = 400)
 
-# print the result from running auto_stratify
+# print and summarize the result from running auto_stratify
 a.strat
+
+summary(a.strat)
 
 ## ------------------------------------------------------------------------
 # get strata table for manually stratified data set

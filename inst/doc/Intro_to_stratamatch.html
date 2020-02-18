@@ -13,7 +13,7 @@
 
 <meta name="author" content="Rachael C. Aikens" />
 
-<meta name="date" content="2020-01-13" />
+<meta name="date" content="2020-02-18" />
 
 <title>Introduction to stratamatch</title>
 
@@ -96,7 +96,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Introduction to stratamatch</h1>
 <h4 class="author">Rachael C. Aikens</h4>
-<h4 class="date">2020-01-13</h4>
+<h4 class="date">2020-02-18</h4>
 
 
 
@@ -169,11 +169,13 @@ m.strat</code></pre></div>
 ## manual_stratify(data = dat, strata_formula = treat ~ B1 + B2 + 
 ##     C1)
 ## 
-## Analysis set dimensions: 5000 X 8
+## Analysis set dimensions: 5000 X 8</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(m.strat)</code></pre></div>
+<pre><code>## Number of strata: 12 
 ## 
-## Number of strata: 12 
+##  Min size: 33    Max size: 1533
 ## 
-##  Min size: 33    Max size: 1533</code></pre>
+## Strata with Potential Issues: 8</code></pre>
 <p>Above, we see that <code>manual_stratify</code> returns a <code>manual strata</code> object. The printed summary above shows that <code>manual_stratify</code> has divided our dataset according to our instructions and produced 12 strata.</p>
 <p>We can extract important information from <code>m.strat</code> with <code>$</code>.</p>
 <p>The most important piece of <code>m.strat</code> is the analysis set. This is the stratified data which we can later match and use for effect estimation.</p>
@@ -198,7 +200,7 @@ m.strat</code></pre></div>
                          <span class="dt">pilot_fraction =</span> <span class="fl">0.1</span>, <span class="dt">size =</span> <span class="dv">400</span>)</code></pre></div>
 <pre><code>## Constructing a pilot set by subsampling 10% of controls.</code></pre>
 <pre><code>## Fitting prognostic model via logistic regression: outcome ~ X1 + X2</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># print the result from running auto_stratify</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># print and summarize the result from running auto_stratify</span>
 a.strat</code></pre></div>
 <pre><code>## auto_strata object from package stratamatch.
 ## 
@@ -211,11 +213,13 @@ a.strat</code></pre></div>
 ## Pilot set dimensions: 381 X 7
 ## 
 ## Prognostic Score Formula:
-## outcome ~ X1 + X2
+## outcome ~ X1 + X2</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(a.strat)</code></pre></div>
+<pre><code>## Number of strata: 12 
 ## 
-## Number of strata: 12 
+##  Min size: 384   Max size: 385
 ## 
-##  Min size: 384   Max size: 385</code></pre>
+## Strata with Potential Issues: 2</code></pre>
 <p>Our call to <code>auto_stratify</code> has created <code>auto_strata</code> object. An <code>auto_strata</code> object is much like a <code>manual_strata</code> object, except that it contains somewhat more information, since the stratification process was done differently. Importantly, <code>auto_strata</code> has partitioned 10% of the individuals in the control group to be in the pilot set. These individuals were used to build the prognostic score, and were extracted from the analysis set. In order to prevent overfitting, the observations in the pilot set should not be included in later analyses, and should not be reused when making the final effect estimate.</p>
 <p>We can access the pilot set and the analysis set using <code>$</code> with <code>a.strat</code>. The command <code>a.strat$analysis_set</code> gives the analysis set and <code>a.strat$pilot_set</code> gives the pilot set. We can also view the prognostic score estimates for the individuals in the analysis set with <code>a.strat$prognostic_scores</code>.</p>
 <div id="alternative-methods-for-automatic-stratification." class="section level3">

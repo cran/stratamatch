@@ -39,7 +39,40 @@ composition of the whole data set in terms of these covariates.  The
 specified covariates must be categorical.}
 }
 \value{
-Returns a \code{strata} object
+Returns an \code{auto_strata} object.  This contains: \itemize{
+
+  \item \code{outcome} - a string giving the name of the column where outcome
+  information is stored
+
+  \item \code{treat} - a string giving the name of the column encoding
+  treatment assignment
+
+  \item \code{analysis_set} - the data set with strata assignments
+
+  \item \code{call} - the call to \code{auto_stratify} used to generate this
+  object
+
+  \item \code{issue_table} - a table of each stratum and potential issues of
+  size and treat:control balance
+
+  \item \code{strata_table} - a table of each stratum and the prognostic
+  score quantile bin to which it corresponds
+
+  \item \code{prognostic_scores} - a vector of prognostic scores.
+
+  \item \code{prognostic_model} - a model for prognosis fit on a pilot data
+  set.  Will be \code{NULL} if a vector of prognostic scores was provided as
+  the \code{prognosis} argument to \code{auto_stratify} rather than a model
+  or formula.
+
+  \item \code{pilot_set} - the set of controls used to fit the prognostic
+  model. These are excluded from subsequent analysis so that the prognostic
+  score is not overfit to the data used to estimate the treatment effect.
+  Will be \code{NULL} if a pre-fit model or a vector of prognostic scores was
+  provided as the \code{prognosis} argument to \code{auto_stratify} rather
+  than formula.
+
+  }
 }
 \description{
 Automatically creates strata for matching based on a prognostic score formula

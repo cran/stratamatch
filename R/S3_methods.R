@@ -1,6 +1,6 @@
 #---------------------------------------------------------- 
 ## CONTAINS: Methods for the strata objects for the generics `is`, `print`,
-## `summarize`, and `plot`
+## `summary`, and `plot`
 #----------------------------------------------------------
 
 #----------------------------------------------------------
@@ -94,10 +94,6 @@ print.auto_strata <- function(x, ...) {
   } else {
     writeLines("\nPrognostic Scores prespecified.")
   }
-
-  writeLines(paste("\nNumber of strata:", dim(x$issue_table)[1],
-                   "\n\n\tMin size:", min(x$issue_table$Total),
-                   "\tMax size:", max(x$issue_table$Total)))
 }
 
 #' Print Manual Strata
@@ -120,11 +116,36 @@ print.manual_strata <- function(x, ...) {
   writeLines(paste("\nAnalysis set dimensions:",
                    dim(x$analysis_set)[1], "X",
                    dim(x$analysis_set)[2]))
-
-  writeLines(paste("\nNumber of strata:", dim(x$issue_table)[1],
-                   "\n\n\tMin size:", min(x$issue_table$Total),
-                   "\tMax size:", max(x$issue_table$Total)))
 }
+
+#----------------------------------------------------------
+### SUMMARY
+#----------------------------------------------------------
+
+#' Summary for strata object
+#'
+#' Summarize number and sizes of strata in a \code{strata} object.  Also prints
+#' number of strata with potential issues.
+#'
+#' For more information, access the issue table for your strata object with
+#' \code{mystrata$issue_table}.
+#'
+#' @param object a \code{strata} object
+#' @param ... other arguments
+#' @export
+#' @examples
+#' dat <- make_sample_data()
+#' m.strat <- manual_stratify(dat, treat ~ C1)
+#' summary(m.strat) # Summarizes strata in m.strat
+summary.strata <- function(object, ...){
+  writeLines(paste("Number of strata:", dim(object$issue_table)[1],
+                   "\n\n\tMin size:", min(object$issue_table$Total),
+                   "\tMax size:", max(object$issue_table$Total)))
+  
+  writeLines(paste("\nStrata with Potential Issues:", 
+                   sum(object$issue_table$Potential_Issues != "none")))
+}
+
 
 #----------------------------------------------------------
 ### PLOT METHODS
@@ -189,6 +210,7 @@ plot.strata <- function(x, type = "SR", label = FALSE, jitter_prognosis,
 #' Produces a scatter plot of strata by size and control proportion.
 #'
 #' @inheritParams plot.strata
+#' @keywords internal
 make_SR_plot <- function(x, label) {
   issue_table <- x$issue_table
 
@@ -222,6 +244,7 @@ make_SR_plot <- function(x, label) {
 #'
 #' @inheritParams plot.strata
 #' @param s the number code of the strata to be plotted
+#' @keywords internal
 make_hist_plot <- function(x, propensity, s){
   a_set <- x$analysis_set
 
@@ -268,6 +291,7 @@ make_hist_plot <- function(x, propensity, s){
 #' @param s the number code of the stratum to be plotted
 #' @seealso Aikens et al. (preprint) \url{https://arxiv.org/abs/1908.09077} .
 #'   Section 3.2 for an explaination of Fisher-Mill plots
+#' @keywords internal
 make_fm_plot <- function(x, propensity, s, jitter_prognosis, jitter_propensity){
   if (!is.auto_strata(x)){
     stop("Cannot make Fisher-Mill plots on manually stratified data.")
@@ -320,6 +344,7 @@ make_fm_plot <- function(x, propensity, s, jitter_prognosis, jitter_propensity){
 #' plots for the prognostic score model
 #'
 #' @inheritParams plot.strata
+#' @keywords internal
 make_resid_plot <- function(x){
   if (!is.auto_strata(x)){
     stop("Prognostic score residual plots are only valid for auto-stratified data.")
@@ -346,6 +371,7 @@ make_resid_plot <- function(x){
 #' @param treat, the name of the treatment assignment column
 #'
 #' @return vector of propensity scores
+#' @keywords internal
 get_prop_scores <- function(propensity, data, treat){
   # if it is a vector of propensity scores, check and return it
   if (is.numeric(propensity)){
@@ -378,6 +404,7 @@ get_prop_scores <- function(propensity, data, treat){
 #' @param prop_formula a formula
 #' 
 #' @return nothing
+#' @keywords internal
 check_prop_formula <- function(prop_formula, data, treat){
   if (!(treat == all.vars(prop_formula)[1])) {
     stop("propensity formula must model treatment assignment")
