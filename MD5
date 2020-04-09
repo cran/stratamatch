@@ -1,10 +1,10 @@
-9be8459c2e440c7f4fb1fff51dff6521 *DESCRIPTION
+900d99c8323e14dcffdbc5e02f29f04b *DESCRIPTION
 84e4afad552df5b774595105feb74c97 *NAMESPACE
 886de5bd1dbd4cc50d9dbbfe8929aeb3 *R/ICU_data_documentation.R
 3dcd88d3754ecab86cd0c5d781eab341 *R/S3_methods.R
 faf6b94a421b672dcf06ebe983065fca *R/auto_stratify.R
 dc95abe4fc6ce71292eaf0dc9090fc53 *R/imported_functions.R
-5e62d1de0505324045c6659ddf490f2c *R/make_issue_table.R
+1986ed069457b4115707b6000578145a *R/make_issue_table.R
 c31ff538472e945a945034d7695ff7a3 *R/make_sample_data.R
 bebfc378774b4d7b6d5a2dc17b31c10d *R/manual_stratify.R
 21327b78504c8a930f56fade6a7207c6 *R/match_functions.R
@@ -14,9 +14,10 @@ bebfc378774b4d7b6d5a2dc17b31c10d *R/manual_stratify.R
 f45b8111919a67d2f995d886b51d3bcd *README.md
 fd1977ed0b832609e3e2e110f7e64097 *build/vignette.rds
 364cc4ab7d5ed781b09dd18c10d76b4e *data/ICU_data.rda
+4ccc17fbc190398e39de930f86033fe4 *inst/CITATION
 f7674bb299e7566bbb1505c4f9609586 *inst/doc/Intro_to_stratamatch.R
 47e04b8d97cc8e6122371995c6eeb921 *inst/doc/Intro_to_stratamatch.Rmd
-240f3e6f0be29aaffb7c5f39ca2d6cc0 *inst/doc/Intro_to_stratamatch.html
+915ec5ec7bb34a724155f0ad88e40f23 *inst/doc/Intro_to_stratamatch.html
 7b346eb0e9ba098a34a7f616b0c69435 *man/ICU_data.Rd
 3c1853ffa8f1f501f1799fbf86ea619a *man/auto_stratify.Rd
 984ca5d899707bb5f8b57f5a95f62fd3 *man/build_autostrata.Rd
@@ -63,8 +64,8 @@ b5fd264f2fdf2ce2c4799597439d21e3 *tests/testthat/ref_astrat_summary
 643bfabe9e05eabcd5a6749078bb6051 *tests/testthat/ref_mstrat_print
 e00dc0a394279210c7eab4805f4668a5 *tests/testthat/ref_mstrat_summary
 593eb7a5c99ac60e6cebd20c7cde14c8 *tests/testthat/test-S3_functions.R
-d491b4a7aa5125ffa1eec40e888ed822 *tests/testthat/test-auto_stratify.R
-3446277620e633be931e9ba9f81aa749 *tests/testthat/test-manual_stratify.R
+3d20120df47ae10ee5914db80a4f55d8 *tests/testthat/test-auto_stratify.R
+ba13f761dece7c676f07d3414671712e *tests/testthat/test-manual_stratify.R
 16fb2f0ec90edde04c27f9f001757ed2 *tests/testthat/test-match_functions.R
 21f983a42003c7ac9688e487d48a66f7 *tests/testthat/test-split_pilot_set.R
 c7b3a88e111fcb636a3185f30d0a5d26 *tests/testthat/test_data.csv
