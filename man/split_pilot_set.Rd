@@ -4,8 +4,13 @@
 \alias{split_pilot_set}
 \title{Split data into pilot and analysis sets}
 \usage{
-split_pilot_set(data, treat, pilot_fraction = 0.1, pilot_sample = NULL,
-  group_by_covariates = NULL)
+split_pilot_set(
+  data,
+  treat,
+  pilot_fraction = 0.1,
+  pilot_size = NULL,
+  group_by_covariates = NULL
+)
 }
 \arguments{
 \item{data}{\code{data.frame} with observations as rows, features as columns}
@@ -16,8 +21,11 @@ assignment}
 \item{pilot_fraction}{numeric between 0 and 1 giving the proportion of
 controls to be allotted for building the prognostic score (default = 0.1)}
 
-\item{pilot_sample}{a data.frame of held aside samples for building
-prognostic score model.}
+\item{pilot_size}{alternative to pilot_fraction. Approximate number of
+observations to be used in pilot set. Note that the actual pilot set size
+returned may not be exactly \code{pilot_size} if \code{group_by_covariates}
+is specified because balancing by covariates may result in deviations from
+desired size. If \code{pilot_size} is specified, \code{pilot_fraction} is ignored.}
 
 \item{group_by_covariates}{character vector giving the names of covariates to
 be grouped by (optional). If specified, the pilot set will be sampled in a
@@ -29,15 +37,15 @@ specified covariates must be categorical.}
 a list with analaysis_set and pilot_set
 }
 \description{
-Exported for the convenience of the user, although in practice this process
-is almost always done using \code{\link{auto_stratify}}.  Given a data set
-and some parameters about how to split the data, this function partitions the
-data accordingly and returns the partitioned data as a list containing the
-\code{analysis_set} and \code{pilot_set}.
+Given a data set and some parameters about how to split the data, this
+function partitions the data accordingly and returns the partitioned data as
+a list containing the \code{analysis_set} and \code{pilot_set}.
 }
 \examples{
-  dat <- make_sample_data()
-  splt <- split_pilot_set(dat, "treat", 0.2)
-  a.strat <- auto_stratify(splt$analysis_set, "treat", outcome ~ X1,
-   pilot_sample = splt$pilot_set)
+dat <- make_sample_data()
+splt <- split_pilot_set(dat, "treat", 0.2)
+# can be passed into auto_stratify if desired
+a.strat <- auto_stratify(splt$analysis_set, "treat", outcome ~ X1,
+  pilot_sample = splt$pilot_set
+)
 }

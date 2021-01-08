@@ -4,34 +4,46 @@
 \alias{plot.strata}
 \title{Plot method for \code{strata} object}
 \usage{
-\method{plot}{strata}(x, type = "SR", label = FALSE, jitter_prognosis,
-  jitter_propensity, propensity, stratum, ...)
+\method{plot}{strata}(
+  x,
+  type = "SR",
+  label = FALSE,
+  stratum = "all",
+  strata_lines = TRUE,
+  jitter_prognosis,
+  jitter_propensity,
+  propensity,
+  ...
+)
 }
 \arguments{
 \item{x}{a \code{strata} object returned by \code{\link{auto_stratify}} or
 \code{\link{manual_stratify}}}
 
 \item{type}{string giving the plot type (default = \code{"SR"}).  Other
-options are \code{"hist"}, \code{"FM"} and \code{"residual"}}
+options are \code{"hist"}, \code{"AC"} and \code{"residual"}}
 
 \item{label}{ignored unless \code{type = "SR"}. If \code{TRUE}, a clickable
 plot is produced. The user may click on any number of strata and press
 finish to have those strata labeled.  Note: uses \code{\link{identify}},
 which may not be supported on some devices}
 
-\item{jitter_prognosis}{ignored unless \code{type = "FM"}.  Amount of uniform
+\item{stratum}{ignored unless \code{type = "hist"} or \code{type = "AC"}. A
+number specifying which stratum to plot.}
+
+\item{strata_lines}{default = \code{TRUE}. Ignored unless \code{type = "AC"}.
+If TRUE, lines on the plot indicate strata cut points.}
+
+\item{jitter_prognosis}{ignored unless \code{type = "AC"}.  Amount of uniform
 random noise to add to prognostic scores in plot.}
 
-\item{jitter_propensity}{ignored unless \code{type = "FM"}.  Amount of
+\item{jitter_propensity}{ignored unless \code{type = "AC"}.  Amount of
 uniform random noise to add to propensity scores in plot.}
 
-\item{propensity}{ignored unless \code{type = "hist"} or \code{type = "FM"}.
+\item{propensity}{ignored unless \code{type = "hist"} or \code{type = "AC"}.
 Specifies propensity score information for plots where this is required.
 Accepts either a vector of propensity scores, a \code{glm} model for
 propensity scores, or a formula for fitting a propensity score model.}
-
-\item{stratum}{ignored unless \code{type = "hist"} or \code{type = "FM"}. A
-number specifying which stratum to plot.}
 
 \item{...}{other arguments}
 }
@@ -40,21 +52,21 @@ Generates diagnostic plots for the product of a stratification by
 \code{\link{auto_stratify}} or \code{\link{manual_stratify}}.  There are
 three plot types: \enumerate{ \item \code{"SR"} (default) - produces a
 scatter plot of strata by size and treat:control ratio \item \code{"hist"} -
-produces a histogram of propensity scores within a stratum \item \code{"FM"}
-- produces a Fisher-Mill plot of individuals within a stratum  (not supported
-for \code{manual strata} objects) \item \code{"residual"} - produces a
-residual plot for the prognostic model (not supported for \code{manual
-strata} objects)}
+produces a histogram of propensity scores within a stratum \item \code{"AC"}
+- produces a Assignment-Control plot of individuals within a stratum  (not
+supported for \code{manual strata} objects) \item \code{"residual"} -
+produces a residual plot for the prognostic model (not supported for
+\code{manual strata} objects)}
 }
 \examples{
 dat <- make_sample_data()
 a.strat <- auto_stratify(dat, "treat", outcome ~ X1 + X2)
 plot(a.strat) # makes size-ratio scatter plot
 plot(a.strat, type = "hist", propensity = treat ~ X1, stratum = 1)
-plot(a.strat, type = "FM", propensity = treat ~ X1, stratum = 1)
+plot(a.strat, type = "AC", propensity = treat ~ X1, stratum = 1)
 plot(a.strat, type = "residual")
 }
 \seealso{
 Aikens et al. (preprint) \url{https://arxiv.org/abs/1908.09077} .
-  Section 3.2 for an explaination of Fisher-Mill plots
+  Section 3.2 for an explaination of Assignment-Control plots
 }

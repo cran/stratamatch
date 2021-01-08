@@ -11,7 +11,7 @@ vignette: >
 
 
 ```{r, warning=FALSE, message = FALSE, include = FALSE}
-knitr::opts_chunk$set(warning = TRUE, message = TRUE, fig.align = "center", fig.height = 4, fig.width = 4)
+knitr::opts_chunk$set(warning = TRUE, message = TRUE, fig.align = "center", fig.height = 5, fig.width = 6)
 ```
 
 
@@ -41,7 +41,7 @@ Once we have decided to stratify our data set, the question becomes: how should 
 
 ## How stratamatch Works
 
-Stratamatch uses a pilot design to estimate a quantity called the prognostic score ([Hansen (2008)](https://academic.oup.com/biomet/article/95/2/481/230183)), defined here as an individual's expected outcome under the control assignment, based on their baseline covariates. Balancing observational data sets based on the prognostic score can the reduce heterogeneity between matched individuals, decreasing variance and diminishing the sensitivity of the study results to unobserved confounding (See [Aikens et al (2019)](https://arxiv.org/abs/1908.09077); [Antonelli et al (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6347556/); and [Leacy and Stuart (2014)](https://www.ncbi.nlm.nih.gov/pubmed/24151187)) .  Moreover, since the prognostic score is often continuous, strata can be easily determined using prognostic score quantiles to select evenly sized bins for the data.  This circumvents common problems with stratification based on expert knowledge, since that process often generates strata which are too large, too small, or too poorly balanced between treatment and control observations.
+Stratamatch uses a pilot design to estimate a quantity called the prognostic score ([Hansen (2008)](https://academic.oup.com/biomet/article/95/2/481/230183)), defined here as an individual's expected outcome under the control assignment, based on their baseline covariates. Balancing observational data sets based on the prognostic score can the reduce heterogeneity between matched individuals, decreasing variance and diminishing the sensitivity of the study results to unobserved confounding (See [Aikens et al (2019)](https://arxiv.org/abs/1908.09077); [Antonelli et al (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6347556/); and [Leacy and Stuart (2014)](https://pubmed.ncbi.nlm.nih.gov/24151187/)).  Moreover, since the prognostic score is often continuous, strata can be easily determined using prognostic score quantiles to select evenly sized bins for the data.  This circumvents common problems with stratification based on expert knowledge, since that process often generates strata which are too large, too small, or too poorly balanced between treatment and control observations.
 
 The stratamatch function, `auto_stratify`, carries out the prognostic score stratification pilot design described above.  Although there are many additional options available when running this function, the most basic procedure does the following: 
 
@@ -107,7 +107,7 @@ Since we didn't use a pilot design for this example, our analysis set just has a
 
 In contrast to `manual_stratify`, the `auto_stratify` function automatically creates the stratified data set based on estimated prognostic scores.  In this process, we specify what model we want to use for the prognostic score (the `prognosis` argument) and what percent of the control reserve we want to use to do the fitting (the `pilot_fraction`) argument.  We also need to tell `auto_stratify` which column of our data set designates the treatment assignment (`treat`).  The final argument, `size,` specifies about how large we would like our strata to be.  I pick `size = 400` here so that we get roughly the same number of strata as when we manually stratified our data set.
 
-In practice, `pilot_fraction` and `size` have defaults, so we don't need to specify them every time.  Run `help(auto_stratify)` for more information.
+In practice, `pilot_fraction` and `size` have defaults, so we don't need to specify them every time.  Instead of `pilot_fraction`, we could specify a `pilot_size` to get a pilot set of approximately that number of observations. Run `help(auto_stratify)` for more information.
 
 ```{r}
 a.strat <- auto_stratify(dat, treat = "treat", prognosis = outcome ~ X1 + X2,
@@ -122,6 +122,10 @@ summary(a.strat)
 Our call to `auto_stratify` has created `auto_strata` object.  An `auto_strata` object is much like a `manual_strata` object, except that it contains somewhat more information, since the stratification process was done differently.  Importantly, `auto_strata` has partitioned 10% of the individuals in the control group to be in the pilot set.  These individuals were used to build the prognostic score, and were extracted from the analysis set. In order to prevent overfitting, the observations in the pilot set should not be included in later analyses, and should not be reused when making the final effect estimate.
 
 We can access the pilot set and the analysis set using `$` with `a.strat`.  The command `a.strat$analysis_set` gives the analysis set and `a.strat$pilot_set` gives the pilot set.   We can also view the prognostic score estimates for the individuals in the analysis set with `a.strat$prognostic_scores`.
+
+### A note on splitting the pilot set
+
+Suppose you're interested in partitioning your data into a pilot set and an analysis set, but you'd like to do other things with it after that - for example perhaps you'd like to fit a more complicated model for prognostic score than a logistic regression.  The `split_pilot_set` will split your pilot and analysis set for you based on specified preferences.  For more information, run `help(split_pilot_set)`.
 
 ### Alternative methods for automatic stratification.
 
@@ -145,7 +149,7 @@ The strata table for an automatically stratified data set is somewhat different:
 a.strat$strata_table
 ```
 
-The strata table for `a.strat` shows what prognostic score quantiles were used to divide the strata.  For example, individuals in stratum 1 have the lowest prognostic scores. This means that, if the individuals in stratum 1 were in the control group, we would predict them to have a very low probability of having the positive outcome, based solely on their values of `X1` and `X2`.
+The strata table for `a.strat` shows what prognostic score quantiles were used to divide the strata.  For example, individuals in stratum 1 have the lowest prognostic scores. This means that, if the individuals in stratum 1 were in the control group, we would predict them to have a very low probability of having the positive outcome, based solely on their values of `X1` and `X2`.  The a vector of the cutoff values used to divide the strata can be extracted from `a.strat` with `extract_cut_points`.
 
 ## Issue Tables
 
@@ -189,29 +193,35 @@ This plot clearly shows that the strata generated by auto_stratify are all about
 
 ### Propensity Score Histograms
 
-The second plot we can make to diagnose issues both manually and automatically stratified data is an overlap histogram.  Below, I've made an overlap histogram for stratum 1.  This shows the propensity score distributions of the treated and control populations.  In order to make this histogram, we must tell the `plot` function what the propensity scores are for our data set by specifying the `propensity`argument.  We have three options: `propensity` can be a propensity score formula (which will then be fit on the analysis set), a `glm` modeling propensity score, or a vector of propensity scores.  Here, I just pass in a formula.
+The second plot we can make to diagnose issues both manually and automatically stratified data is an overlap histogram.  Below, I've made an overlap histogram for all strata, and an overlap histogram for stratum 3.  This shows the propensity score distributions of the treated and control populations.  In order to make this histogram, we must tell the `plot` function what the propensity scores are for our data set by specifying the `propensity`argument.  We have three options: `propensity` can be a propensity score formula (which will then be fit on the analysis set), a `glm` modeling propensity score, or a vector of propensity scores.  Here, I just pass in a formula.
 
 ```{r}
-# propensity score histograms for stratum 1 from manually stratified data
-plot(m.strat, type = "hist", propensity = treat ~ X2 + X1 + B1 + B2, stratum = 1)
+# propensity score histograms for all strata from manually stratified data
+plot(m.strat, type = "hist", propensity = treat ~ X2 + X1 + B1 + B2)
+
+# propensity score histograms for all strata from manually stratified data
+plot(m.strat, type = "hist", propensity = treat ~ X2 + X1 + B1 + B2, stratum = 3)
 ```
 
-A similar command works for automatically stratified data:
+A similar command works for automatically stratified data. :
 
 ```{r}
-# propensity score histograms for stratum 1 from automatically stratified data
-plot(a.strat, type = "hist", propensity = treat ~ X2 + X1 + B1 + B2, stratum = 1)
+# propensity score histograms for stratum 3 from automatically stratified data
+plot(a.strat, type = "hist", propensity = treat ~ X2 + X1 + B1 + B2, stratum = 3)
 ```
 
-### Fisher-Mill Plots for Automatically Stratified Data
+### Assignment-Control Plots for Automatically Stratified Data
 
-In addition to the two plot types above, there are some plots that can be used to visualize `auto_strata` objects only: `"residual"` and `"FM"` plots.
+In addition to the two plot types above, there are some plots that can be used to visualize `auto_strata` objects only: `"residual"` and `"AC"` plots.
 
-Setting `type = "FM"` in the plot command produces a Fisher-Mill plot for a given stratum.  This shows each individual in the stratum in terms of their estimated propensity score and their estimated prognostic score (for more details, see [Aikens et al (2019)](https://arxiv.org/abs/1908.09077)).  This allows us to check how well the treated and control samples overlap not only in their probability for treatment but in their expected outcome under the control assignment. Just as with the overlap histograms, we need to provide a stratum number and information on the propensity score.  Below, I use the same propensity formula as in the histogram above.  Below, we see relatively good overlap.  Prognostic score has a hard upper limit because we are looking at the first stratum, which means these are the lowest prognostic scores in our data set.
+Setting `type = "AC"` in the plot command produces a Assignment-Control plot.  This shows each individual in terms of their estimated propensity score and their estimated prognostic score (for more details, see [Aikens et al (2019)](https://arxiv.org/abs/1908.09077)).  This allows us to check how well the treated and control samples overlap not only in their probability for treatment but in their expected outcome under the control assignment. Just as with the overlap histograms, we need to provide information on the propensity score.  Below, I use the same propensity formula as in the histogram above.  The first plot shows all of the strata, with lines indicating the barriers between strata, while the second plot looks specifically at stratum 3 by specifying the `stratum` argument.  Apparent striations or groupings in assignment control plots like the ones below are common; they appear when some binary or categorical covariate has a strong association with either the outcome or the treatment assignment.
 
-```{r}
-# make a Fisher-Mill plot
-plot(a.strat, type = "FM", propensity = treat ~ X1 + X2, stratum = 1)
+```{r fig.height= 5.5, fig.width=7}
+# make a Assignment-Control plot
+plot(a.strat, type = "AC", propensity = treat ~ X1 + X2 + B1 + B2)
+
+# make a Assignment-Control plot
+plot(a.strat, type = "AC", propensity = treat ~ X1 + X2 + B1 + B2, stratum = 3)
 ```
 
 

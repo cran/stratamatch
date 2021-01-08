@@ -4,8 +4,16 @@
 \alias{build_autostrata}
 \title{Build Autostrata object}
 \usage{
-build_autostrata(data, treat, prognosis, outcome, pilot_fraction,
-  pilot_sample, group_by_covariates)
+build_autostrata(
+  data,
+  treat,
+  prognosis,
+  outcome,
+  pilot_fraction,
+  pilot_size,
+  pilot_sample,
+  group_by_covariates
+)
 }
 \arguments{
 \item{data}{\code{data.frame} with observations as rows, features as columns}
@@ -26,8 +34,15 @@ from prog_formula}
 \item{pilot_fraction}{numeric between 0 and 1 giving the proportion of
 controls to be allotted for building the prognostic score (default = 0.1)}
 
+\item{pilot_size}{alternative to pilot_fraction. Approximate number of
+observations to be used in pilot set. Note that the actual pilot set size
+returned may not be exactly \code{pilot_size} if \code{group_by_covariates}
+is specified because balancing by covariates may result in deviations from
+desired size. If \code{pilot_size} is specified, \code{pilot_fraction} is ignored.}
+
 \item{pilot_sample}{a data.frame of held aside samples for building
-prognostic score model.}
+prognostic score model. If \code{pilot_sample} is specified, \code{pilot_size} and
+\code{pilot_fraction} are both ignored.}
 
 \item{group_by_covariates}{character vector giving the names of covariates to
 be grouped by (optional). If specified, the pilot set will be sampled in a
