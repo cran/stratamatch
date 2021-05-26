@@ -65,7 +65,7 @@ test_that("Plot errors work", {
   # residual plots
   expect_error(
     plot(m.strat, type = "residual"),
-    "Prognostic score residual plots are only valid for auto-stratified data."
+    "Cannot make prognostic score residual plot on manually stratified data."
   )
   expect_error(
     plot(a.strat, type = "residual"),
@@ -112,7 +112,8 @@ test_that("Plot errors work", {
       type = "hist",
       propensity = outcomes ~ X1, stratum = 1
     ),
-    "propensity formula must model treatment assignment"
+    "Model formula must have the format: treated ~ [covariates]",
+    fixed = TRUE
   )
   expect_error(
     plot(a.strat, type = "hist", propensity = "soup", stratum = 1),

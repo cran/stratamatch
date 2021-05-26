@@ -1,8 +1,8 @@
 Package: stratamatch
 Type: Package
-Date: 2021-01-05
+Date: 2021-05-25
 Title: Stratification and Matching for Large Observational Data Sets
-Version: 0.1.6
+Version: 0.1.7
 Authors@R: c(
            person("Rachael C.", "Aikens", email = "rockyaikens@gmail.com",
                   role = c("aut", "cre")),
@@ -31,16 +31,17 @@ LazyData: true
 Imports: dplyr (>= 0.8.3), Hmisc (>= 4.2-0), magrittr (>= 1.5), rlang
         (>= 0.4.0), survival(>= 2.44.1.1)
 Depends: R (>= 3.4.0)
-Suggests: knitr, optmatch (>= 0.9-11), rmarkdown, testthat (>= 2.1.0)
+Suggests: knitr, optmatch (>= 0.9-11), rmarkdown, testthat (>= 2.1.0),
+        glmnet (>= 4.0), randomForest (>= 4.6-14)
 URL: https://github.com/raikens1/stratamatch
 RoxygenNote: 7.1.0
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2021-01-08 18:18:13 UTC; rocky
+Packaged: 2021-05-26 00:11:19 UTC; rocky
 Author: Rachael C. Aikens [aut, cre],
   Joseph Rigdon [aut],
   Justin Lee [aut],
   Michael Baiocchi [aut],
   Jonathan Chen [aut]
 Repository: CRAN
-Date/Publication: 2021-01-08 20:00:02 UTC
+Date/Publication: 2021-05-26 04:20:02 UTC
