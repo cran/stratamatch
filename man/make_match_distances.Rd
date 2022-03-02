@@ -24,7 +24,8 @@ a match distance matrix for optmatch
 \description{
 Makes the match distance with strata specifications for \code{strata_match}.
 This function is largely unecessary to call outside of stratamatch, but it is
-exported for the benefit of the user to aid in debugging.
+exported for the benefit of the user to aid in debugging.  Note that this 
+function requires that the R package \code{optmatch} is installed.
 }
 \examples{
 
@@ -32,5 +33,12 @@ dat <- make_sample_data(n = 75)
 
 # stratify with auto_stratify
 a.strat <- auto_stratify(dat, "treat", outcome ~ X2, size = 25)
+
+# make match distances.  Requires optmatch package to be installed.
+\dontshow{if (requireNamespace("optmatch", quietly = TRUE)) \{}
 md <- make_match_distances(a.strat, treat ~ X1 + X2, method = "mahal")
+\dontshow{\}}
+}
+\seealso{
+\url{https://cran.r-project.org/package=optmatch}
 }

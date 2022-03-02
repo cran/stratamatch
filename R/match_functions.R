@@ -5,8 +5,8 @@
 
 #' Strata Match
 #'
-#' Match within strata in series using optmatch.  Requires optmatch package to
-#' be installed.
+#' Match within strata in series using optmatch. Note that this function 
+#' requires that the R package \code{optmatch} is installed.
 #'
 #' @param object a strata object
 #' @param model (optional) formula for matching.  If left blank, \emph{all}
@@ -20,6 +20,7 @@
 #'   individual.  If \code{"k = full"} is used, fullmatching is done instead of
 #'   pairmatching
 #' @return a named factor with matching assignments
+#' @seealso \url{https://cran.r-project.org/package=optmatch}
 #' @export
 #' @examples
 #' # make a sample data set
@@ -30,9 +31,16 @@
 #' a.strat <- auto_stratify(dat, "treat", outcome ~ X2, size = 25)
 #'
 #' # 1:1 match based on propensity formula: treat ~ X1 + X2
+#' # Requires optmatch package to be installed.
+#' \dontshow{if (requireNamespace("optmatch", quietly = TRUE)) \{}
 #' strata_match(a.strat, model = treat ~ X1 + X2, k = 1)
+#' \dontshow{\}}
+#' 
 #' # full match within strata based on mahalanobis distance.
+#' # Requires optmatch package to be installed.
+#' \dontshow{if (requireNamespace("optmatch", quietly = TRUE)) \{}
 #' strata_match(a.strat, model = treat ~ X1 + X2, method = "mahal", k = 1)
+#' \dontshow{\}}
 strata_match <- function(object, model = NULL, method = "prop", k = 1) {
   if (!requireNamespace("optmatch", quietly = TRUE)) {
     stop("optmatch package is required.  Please install it.")
@@ -66,11 +74,13 @@ strata_match <- function(object, model = NULL, method = "prop", k = 1) {
 #' Match without Stratification
 #'
 #' Not meant to be called externally.  Match a data set without stratifying.
-#' Used to compare performance with and without stratification.
+#' Used to compare performance with and without stratification. Note that this 
+#' function requires that the R package \code{optmatch} is installed.
 #'
 #' @inheritParams strata_match
 #'
 #' @return a named factor with matching assignments
+#' @seealso \url{https://cran.r-project.org/package=optmatch}
 #'
 #' @keywords internal
 strata_match_nstrat <- function(object, model = NULL, k = 1) {
@@ -148,11 +158,14 @@ check_inputs_matcher <- function(object, model, k) {
 #'
 #' Makes the match distance with strata specifications for \code{strata_match}.
 #' This function is largely unecessary to call outside of stratamatch, but it is
-#' exported for the benefit of the user to aid in debugging.
+#' exported for the benefit of the user to aid in debugging.  Note that this 
+#' function requires that the R package \code{optmatch} is installed.
+#' 
 #'
 #' @inheritParams strata_match
 #'
 #' @return a match distance matrix for optmatch
+#' @seealso \url{https://cran.r-project.org/package=optmatch}
 #' @export
 #'
 #' @examples
@@ -161,7 +174,11 @@ check_inputs_matcher <- function(object, model, k) {
 #'
 #' # stratify with auto_stratify
 #' a.strat <- auto_stratify(dat, "treat", outcome ~ X2, size = 25)
+#' 
+#' # make match distances.  Requires optmatch package to be installed.
+#' \dontshow{if (requireNamespace("optmatch", quietly = TRUE)) \{}
 #' md <- make_match_distances(a.strat, treat ~ X1 + X2, method = "mahal")
+#' \dontshow{\}}
 make_match_distances <- function(object, model, method) {
   strata_formula <- formula(paste(object$treat, "~ stratum"))
 

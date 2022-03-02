@@ -23,6 +23,10 @@ a named factor with matching assignments
 }
 \description{
 Not meant to be called externally.  Match a data set without stratifying.
-Used to compare performance with and without stratification.
+Used to compare performance with and without stratification. Note that this 
+function requires that the R package \code{optmatch} is installed.
+}
+\seealso{
+\url{https://cran.r-project.org/package=optmatch}
 }
 \keyword{internal}

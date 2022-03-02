@@ -175,7 +175,11 @@ a.strat_forest <- auto_stratify(data = mysplit$analysis_set,
 
 # Alternative matching schemes
 
-"Intro to Stratamatch" covers only the default functionality of `stratamatch`, which is a fixed 1:k propensity score match within strata.  This tutorial covers some alternative options.
+"Intro to Stratamatch" covers only the default functionality of `stratamatch`, which is a fixed 1:k propensity score match within strata.  This tutorial covers some alternative options.  Note that the examples that follow all require the R package `optmatch` (@hansen2006optmatch) to be installed.
+
+```{r, include=FALSE}
+if (!requireNamespace("optmatch", quietly = TRUE)) knitr::opts_chunk$set(eval = FALSE)
+```
 
 ## Distance measure: Mahalanobis Distance
 

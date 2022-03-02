@@ -200,13 +200,11 @@ auto_stratify <- function(data, treat, prognosis,
   # Create strata from prognostic score quantiles
   n_bins <- ceiling(dim(analysis_set)[1] / size)
 
-  withCallingHandlers(
-    {
+  withCallingHandlers({
       qcut <- Hmisc::cut2(prognostic_scores, g = n_bins)
     },
     error = function(c) {
-      stop("Error defining quantile bins: (Sometimes this happens when \"size\" << analysis set size.)")
-    }
+      stop("Error defining quantile bins: (Sometimes this happens when \"size\" << analysis set size.)")}
   )
 
   # make strata table

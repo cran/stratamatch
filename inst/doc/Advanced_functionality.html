@@ -314,16 +314,20 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>We’ll start with some sample data:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(stratamatch)</a>
 <a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">library</span>(dplyr)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt; Attaching package: 'dplyr'</span></a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt; The following objects are masked from 'package:stats':</span></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co">#&gt;     filter, lag</span></a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co">#&gt; The following objects are masked from 'package:base':</span></a>
-<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
-<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
-<a class="sourceLine" id="cb1-12" data-line-number="12">mydata &lt;-<span class="st"> </span><span class="kw">make_sample_data</span>(<span class="dt">n =</span> <span class="dv">5000</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co">#&gt; Registered S3 methods overwritten by 'tibble':</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt;   method     from  </span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt;   format.tbl pillar</span></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co">#&gt;   print.tbl  pillar</span></a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co">#&gt; Attaching package: 'dplyr'</span></a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co">#&gt; The following objects are masked from 'package:stats':</span></a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co">#&gt;     filter, lag</span></a>
+<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co">#&gt; The following objects are masked from 'package:base':</span></a>
+<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
+<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
+<a class="sourceLine" id="cb1-16" data-line-number="16">mydata &lt;-<span class="st"> </span><span class="kw">make_sample_data</span>(<span class="dt">n =</span> <span class="dv">5000</span>)</a></code></pre></div>
 </div>
 <div id="splitting-the-pilot-set" class="section level1">
 <h1>Splitting the pilot set</h1>
@@ -447,73 +451,44 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="alternative-matching-schemes" class="section level1">
 <h1>Alternative matching schemes</h1>
-<p>“Intro to Stratamatch” covers only the default functionality of <code>stratamatch</code>, which is a fixed 1:k propensity score match within strata. This tutorial covers some alternative options.</p>
+<p>“Intro to Stratamatch” covers only the default functionality of <code>stratamatch</code>, which is a fixed 1:k propensity score match within strata. This tutorial covers some alternative options. Note that the examples that follow all require the R package <code>optmatch</code> (<span class="citation">Hansen and Klopfer (2006)</span>) to be installed.</p>
 <div id="distance-measure-mahalanobis-distance" class="section level2">
 <h2>Distance measure: Mahalanobis Distance</h2>
 <p>Users can opt to use Mahalanobis distance rather then propensity score for the within-strata matching step by specifying the “method” to <code>strata_match</code>. We set <code>k = 2</code>, so that precisely 2 control observations are matched to each treated observation.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">mahalmatch &lt;-<span class="st"> </span><span class="kw">strata_match</span>(a.strat2, <span class="dt">model =</span> treat <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>B1 <span class="op">+</span><span class="st"> </span>B2,</a>
 <a class="sourceLine" id="cb11-2" data-line-number="2">                           <span class="dt">method =</span> <span class="st">&quot;mahal&quot;</span>, <span class="dt">k =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co">#&gt; This function makes essential use of the optmatch package, which has an academic license.</span></a>
-<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt; For more information, run optmatch::relaxinfo()</span></a>
-<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="co">#&gt; Using Mahalanobis distance: treat ~ X1 + X2 + B1 + B2</span></a>
-<a class="sourceLine" id="cb11-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="kw">summary</span>(mahalmatch)</a>
-<a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; Structure of matched sets:</span></a>
-<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="co">#&gt;  1:2  0:1 </span></a>
-<a class="sourceLine" id="cb11-10" data-line-number="10"><span class="co">#&gt; 1146 1176 </span></a>
-<a class="sourceLine" id="cb11-11" data-line-number="11"><span class="co">#&gt; Effective Sample Size:  1528 </span></a>
-<a class="sourceLine" id="cb11-12" data-line-number="12"><span class="co">#&gt; (equivalent number of matched pairs).</span></a></code></pre></div>
+<a class="sourceLine" id="cb11-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="kw">summary</span>(mahalmatch)</a></code></pre></div>
 </div>
 <div id="matching-procedure-full-matching" class="section level2">
 <h2>Matching procedure: Full Matching</h2>
 <p>Full matching may be a particularly useful approach when the ratio of treated to control individuals varies within strata, but the researcher still would prefer to use as much of the data as possible. To do full matching, set <code>k = &quot;full&quot;</code>. This can be used in combination with mahalanobis distance matching, as shown below:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">fullmahalmatch &lt;-<span class="st"> </span><span class="kw">strata_match</span>(a.strat2, <span class="dt">model =</span> treat <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>B1 <span class="op">+</span><span class="st"> </span>B2,</a>
 <a class="sourceLine" id="cb12-2" data-line-number="2">                           <span class="dt">method =</span> <span class="st">&quot;mahal&quot;</span>, <span class="dt">k =</span> <span class="st">&quot;full&quot;</span>)</a>
-<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="co">#&gt; This function makes essential use of the optmatch package, which has an academic license.</span></a>
-<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt; For more information, run optmatch::relaxinfo()</span></a>
-<a class="sourceLine" id="cb12-5" data-line-number="5"><span class="co">#&gt; Using Mahalanobis distance: treat ~ X1 + X2 + B1 + B2</span></a>
-<a class="sourceLine" id="cb12-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="kw">summary</span>(fullmahalmatch)</a>
-<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="co">#&gt; Structure of matched sets:</span></a>
-<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="co">#&gt; 5+:1  4:1  3:1  2:1  1:1  1:2  1:3  1:4 1:5+ </span></a>
-<a class="sourceLine" id="cb12-10" data-line-number="10"><span class="co">#&gt;    8    6   14   43  448  135   87   69  204 </span></a>
-<a class="sourceLine" id="cb12-11" data-line-number="11"><span class="co">#&gt; Effective Sample Size:  1331.7 </span></a>
-<a class="sourceLine" id="cb12-12" data-line-number="12"><span class="co">#&gt; (equivalent number of matched pairs).</span></a></code></pre></div>
+<a class="sourceLine" id="cb12-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="kw">summary</span>(fullmahalmatch)</a></code></pre></div>
 </div>
 <div id="matching-with-other-software" class="section level2">
 <h2>Matching with other software</h2>
 <p><code>stratamatch</code> doesn’t natively support all possible matching schemes. Luckily, it can be fairly straightforward to stratify a data set with <code>auto_stratify</code> and match the results with other software. As an example, the code below uses the <code>optmatch</code> package (<span class="citation">Hansen and Klopfer (2006)</span>) to match within-strata using Mahalanobis distance with a propensity score caliper.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">library</span>(optmatch)</a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="co">#&gt; Loading required package: survival</span></a>
-<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="co">#&gt; The optmatch package has an academic license. Enter relaxinfo() for more information.</span></a>
-<a class="sourceLine" id="cb13-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb13-5" data-line-number="5"><span class="co"># mahalanobis distance matrix for within-strata matching</span></a>
-<a class="sourceLine" id="cb13-6" data-line-number="6">mahaldist &lt;-<span class="st"> </span><span class="kw">match_on</span>(treat <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>B1 <span class="op">+</span><span class="st"> </span>B2, </a>
-<a class="sourceLine" id="cb13-7" data-line-number="7">                      <span class="dt">within =</span> <span class="kw">exactMatch</span>(treat <span class="op">~</span><span class="st"> </span>stratum,</a>
-<a class="sourceLine" id="cb13-8" data-line-number="8">                                          <span class="dt">data =</span> a.strat2<span class="op">$</span>analysis_set),</a>
-<a class="sourceLine" id="cb13-9" data-line-number="9">                      <span class="dt">data =</span> a.strat2<span class="op">$</span>analysis_set)</a>
-<a class="sourceLine" id="cb13-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb13-11" data-line-number="11"><span class="co"># add propensity score caliper</span></a>
-<a class="sourceLine" id="cb13-12" data-line-number="12">propdist &lt;-<span class="st"> </span><span class="kw">match_on</span>(<span class="kw">glm</span>(treat <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>B1 <span class="op">+</span><span class="st"> </span>B2,</a>
-<a class="sourceLine" id="cb13-13" data-line-number="13">                         <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>,</a>
-<a class="sourceLine" id="cb13-14" data-line-number="14">                         <span class="dt">data =</span> a.strat2<span class="op">$</span>analysis_set))</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="co"># mahalanobis distance matrix for within-strata matching</span></a>
+<a class="sourceLine" id="cb13-4" data-line-number="4">mahaldist &lt;-<span class="st"> </span><span class="kw">match_on</span>(treat <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>B1 <span class="op">+</span><span class="st"> </span>B2, </a>
+<a class="sourceLine" id="cb13-5" data-line-number="5">                      <span class="dt">within =</span> <span class="kw">exactMatch</span>(treat <span class="op">~</span><span class="st"> </span>stratum,</a>
+<a class="sourceLine" id="cb13-6" data-line-number="6">                                          <span class="dt">data =</span> a.strat2<span class="op">$</span>analysis_set),</a>
+<a class="sourceLine" id="cb13-7" data-line-number="7">                      <span class="dt">data =</span> a.strat2<span class="op">$</span>analysis_set)</a>
+<a class="sourceLine" id="cb13-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb13-9" data-line-number="9"><span class="co"># add propensity score caliper</span></a>
+<a class="sourceLine" id="cb13-10" data-line-number="10">propdist &lt;-<span class="st"> </span><span class="kw">match_on</span>(<span class="kw">glm</span>(treat <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>B1 <span class="op">+</span><span class="st"> </span>B2,</a>
+<a class="sourceLine" id="cb13-11" data-line-number="11">                         <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>,</a>
+<a class="sourceLine" id="cb13-12" data-line-number="12">                         <span class="dt">data =</span> a.strat2<span class="op">$</span>analysis_set))</a>
+<a class="sourceLine" id="cb13-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb13-14" data-line-number="14">mahalcaliper &lt;-<span class="st"> </span>mahaldist <span class="op">+</span><span class="st"> </span><span class="kw">caliper</span>(propdist, <span class="dt">width =</span> <span class="dv">1</span>)</a>
 <a class="sourceLine" id="cb13-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb13-16" data-line-number="16">mahalcaliper &lt;-<span class="st"> </span>mahaldist <span class="op">+</span><span class="st"> </span><span class="kw">caliper</span>(propdist, <span class="dt">width =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb13-16" data-line-number="16">mahalcaliper_match &lt;-<span class="st"> </span><span class="kw">pairmatch</span>(mahalcaliper, <span class="dt">data =</span> a.strat2<span class="op">$</span>analysis_set)</a>
 <a class="sourceLine" id="cb13-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb13-18" data-line-number="18">mahalcaliper_match &lt;-<span class="st"> </span><span class="kw">pairmatch</span>(mahalcaliper, <span class="dt">data =</span> a.strat2<span class="op">$</span>analysis_set)</a>
-<a class="sourceLine" id="cb13-19" data-line-number="19"><span class="co">#&gt; Warning in fullmatch.BlockedInfinitySparseMatrix(x = x, min.controls = controls, : At least one subproblem matching failed.</span></a>
-<a class="sourceLine" id="cb13-20" data-line-number="20"><span class="co">#&gt;  (Restrictions impossible to meet?)</span></a>
-<a class="sourceLine" id="cb13-21" data-line-number="21"><span class="co">#&gt;  Enter ?matchfailed for more info.</span></a>
-<a class="sourceLine" id="cb13-22" data-line-number="22"></a>
-<a class="sourceLine" id="cb13-23" data-line-number="23"><span class="kw">summary</span>(mahalcaliper_match)</a>
-<a class="sourceLine" id="cb13-24" data-line-number="24"><span class="co">#&gt; Matches made in 8 of 10 subgroups, accounting for 3691 of 4614 total observations.</span></a>
-<a class="sourceLine" id="cb13-25" data-line-number="25"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb13-26" data-line-number="26"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb13-27" data-line-number="27"><span class="co">#&gt; Structure of matched sets:</span></a>
-<a class="sourceLine" id="cb13-28" data-line-number="28"><span class="co">#&gt;  1:0  1:1  0:1 </span></a>
-<a class="sourceLine" id="cb13-29" data-line-number="29"><span class="co">#&gt;  192  954 2514 </span></a>
-<a class="sourceLine" id="cb13-30" data-line-number="30"><span class="co">#&gt; Effective Sample Size:  954 </span></a>
-<a class="sourceLine" id="cb13-31" data-line-number="31"><span class="co">#&gt; (equivalent number of matched pairs).</span></a></code></pre></div>
+<a class="sourceLine" id="cb13-18" data-line-number="18"><span class="kw">summary</span>(mahalcaliper_match)</a></code></pre></div>
 </div>
 </div>
 <div id="references" class="section level1 unnumbered">

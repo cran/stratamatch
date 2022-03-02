@@ -26,8 +26,8 @@ pairmatching}
 a named factor with matching assignments
 }
 \description{
-Match within strata in series using optmatch.  Requires optmatch package to
-be installed.
+Match within strata in series using optmatch. Note that this function 
+requires that the R package \code{optmatch} is installed.
 }
 \examples{
 # make a sample data set
@@ -38,7 +38,17 @@ dat <- make_sample_data(n = 75)
 a.strat <- auto_stratify(dat, "treat", outcome ~ X2, size = 25)
 
 # 1:1 match based on propensity formula: treat ~ X1 + X2
+# Requires optmatch package to be installed.
+\dontshow{if (requireNamespace("optmatch", quietly = TRUE)) \{}
 strata_match(a.strat, model = treat ~ X1 + X2, k = 1)
+\dontshow{\}}
+
 # full match within strata based on mahalanobis distance.
+# Requires optmatch package to be installed.
+\dontshow{if (requireNamespace("optmatch", quietly = TRUE)) \{}
 strata_match(a.strat, model = treat ~ X1 + X2, method = "mahal", k = 1)
+\dontshow{\}}
+}
+\seealso{
+\url{https://cran.r-project.org/package=optmatch}
 }
