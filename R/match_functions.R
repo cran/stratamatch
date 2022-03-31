@@ -48,9 +48,6 @@ strata_match <- function(object, model = NULL, method = "prop", k = 1) {
 
   check_inputs_matcher(object, model, k)
 
-  message("This function makes essential use of the optmatch package, which has an academic license.")
-  message("For more information, run optmatch::relaxinfo()")
-
   if (is.null(model)) {
     # match on all variables, stratified by stratum
     model <- formula(paste(
@@ -89,9 +86,6 @@ strata_match_nstrat <- function(object, model = NULL, k = 1) {
   }
 
   check_inputs_matcher(object, model, k)
-
-  message("This function makes essential use of the optmatch package, which has an academic license.")
-  message("For more information, run optmatch::relaxinfo()")
 
   if (is.null(model)) {
     # match on all variables, stratified by stratum

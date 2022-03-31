@@ -93,16 +93,16 @@ summary(progmod)
 if (!requireNamespace("optmatch", quietly = TRUE)) knitr::opts_chunk$set(eval = FALSE)
 
 ## -----------------------------------------------------------------------------
-#  # match the automatically stratified data
-#  mymatch <- strata_match(a.strat, treat ~ X1 + X2 + B1 + B2, k = 1)
-#  
-#  # summarize matching results
-#  summary(mymatch)
+# match the automatically stratified data
+mymatch <- strata_match(a.strat, treat ~ X1 + X2 + B1 + B2, k = 1)
+
+# summarize matching results
+summary(mymatch)
 
 ## -----------------------------------------------------------------------------
-#  # add match information as a column in the data set
-#  matched_data <- a.strat$analysis_set
-#  matched_data$match <- as.character(mymatch)
-#  
-#  head(matched_data)
+# add match information as a column in the data set
+matched_data <- a.strat$analysis_set
+matched_data$match <- as.character(mymatch)
+
+head(matched_data)
 

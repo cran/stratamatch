@@ -14,30 +14,62 @@
 
 <title>Advanced Functionality</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -46,9 +78,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -104,6 +136,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </script>
 
 
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
 
 <style type="text/css">body {
 background-color: #fff;
@@ -301,7 +356,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<p><strong>Summary:</strong> “Introduction to stratamatch” covers the basic functionality of <code>stratamatch</code>: stratifying a data set, assessing the quality of the match, and matching the data within strata. This vignette features more advanced functionality of <code>stratamatch</code>.</p>
+<p><strong>Summary:</strong> “Introduction to stratamatch” covers the
+basic functionality of <code>stratamatch</code>: stratifying a data set,
+assessing the quality of the match, and matching the data within strata.
+This vignette features more advanced functionality of
+<code>stratamatch</code>.</p>
 <p>This vignette contains:</p>
 <ol style="list-style-type: decimal">
 <li>Set-up</li>
@@ -312,214 +371,379 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="set-up" class="section level1">
 <h1>Set up</h1>
 <p>We’ll start with some sample data:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(stratamatch)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">library</span>(dplyr)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co">#&gt; Registered S3 methods overwritten by 'tibble':</span></a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt;   method     from  </span></a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt;   format.tbl pillar</span></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co">#&gt;   print.tbl  pillar</span></a>
-<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co">#&gt; Attaching package: 'dplyr'</span></a>
-<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co">#&gt; The following objects are masked from 'package:stats':</span></a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co">#&gt;     filter, lag</span></a>
-<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co">#&gt; The following objects are masked from 'package:base':</span></a>
-<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
-<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
-<a class="sourceLine" id="cb1-16" data-line-number="16">mydata &lt;-<span class="st"> </span><span class="kw">make_sample_data</span>(<span class="dt">n =</span> <span class="dv">5000</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stratamatch)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;dplyr&#39;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from &#39;package:stats&#39;:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     filter, lag</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from &#39;package:base&#39;:</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>mydata <span class="ot">&lt;-</span> <span class="fu">make_sample_data</span>(<span class="at">n =</span> <span class="dv">5000</span>)</span></code></pre></div>
 </div>
 <div id="splitting-the-pilot-set" class="section level1">
 <h1>Splitting the pilot set</h1>
-<p>An important consideration for pilot designs like the <code>stratamatch</code> approach is the selection of the pilot set. Ideally, the individuals in the pilot set should be similarto the individuals in the treatment group, so a prognostic model built on this pilot set will not beextrapolating heavily when estimating prognostic scores on the analysis set. To more closely ensure that the selected pilot set is a representative sample of controls, one easy step is to specify a list of categorical or binary covariates and sample the pilot set proportionally based on these covariates.</p>
-<p>This can be done in one step using <code>auto_stratify</code>, for example:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">a.strat1 &lt;-<span class="st"> </span><span class="kw">auto_stratify</span>(mydata, <span class="st">&quot;treat&quot;</span>,</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">                         <span class="dt">prognosis =</span> outcome <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2,</a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">                         <span class="dt">group_by_covariates =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;B2&quot;</span>), <span class="dt">size =</span> <span class="dv">500</span>)</a>
-<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co">#&gt; Constructing a pilot set by subsampling 10% of controls.</span></a>
-<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">#&gt; Subsampling while balancing on:</span></a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt; C1, B2</span></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt; Fitting prognostic model via logistic regression: outcome ~ X1 + X2</span></a></code></pre></div>
-<p>Another method is to use the <code>split_pilot_set</code> function, which allows the user to split the pilot set (and examine the balance) before passing the result to <code>auto_stratify</code> to fit the prognostic score.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">mysplit &lt;-<span class="st"> </span><span class="kw">split_pilot_set</span>(mydata, <span class="st">&quot;treat&quot;</span>, <span class="dt">group_by_covariates =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;B2&quot;</span>))</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; Constructing a pilot set by subsampling 10% of controls.</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; Subsampling while balancing on:</span></a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt; C1, B2</span></a></code></pre></div>
-<p>The result, <code>mysplit</code>, is a list containing a <code>pilot_set</code> and an <code>analysis_set</code>, in this case partitioned while balancing on B1 and C2. At this point, we might pass the result to <code>auto_stratify</code> as follows:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">a.strat2 &lt;-<span class="st"> </span><span class="kw">auto_stratify</span>(mysplit<span class="op">$</span>analysis_set, <span class="st">&quot;treat&quot;</span>,</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">                          <span class="dt">prognosis =</span> outcome <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2,</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">                          <span class="dt">pilot_sample =</span> mysplit<span class="op">$</span>pilot_set, <span class="dt">size =</span> <span class="dv">500</span>)</a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; Using user-specified set for prognostic score modeling.</span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; Fitting prognostic model via logistic regression: outcome ~ X1 + X2</span></a></code></pre></div>
-<p>In this case, the pilot set splitting method is the same for <code>a.strat1</code> and <code>a.strat2</code>, so each should be qualitatively similar.</p>
+<p>An important consideration for pilot designs like the
+<code>stratamatch</code> approach is the selection of the pilot set.
+Ideally, the individuals in the pilot set should be similarto the
+individuals in the treatment group, so a prognostic model built on this
+pilot set will not beextrapolating heavily when estimating prognostic
+scores on the analysis set. To more closely ensure that the selected
+pilot set is a representative sample of controls, one easy step is to
+specify a list of categorical or binary covariates and sample the pilot
+set proportionally based on these covariates.</p>
+<p>This can be done in one step using <code>auto_stratify</code>, for
+example:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>a.strat1 <span class="ot">&lt;-</span> <span class="fu">auto_stratify</span>(mydata, <span class="st">&quot;treat&quot;</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">prognosis =</span> outcome <span class="sc">~</span> X1 <span class="sc">+</span> X2,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">group_by_covariates =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;B2&quot;</span>), <span class="at">size =</span> <span class="dv">500</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Constructing a pilot set by subsampling 10% of controls.</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Subsampling while balancing on:</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; C1, B2</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Fitting prognostic model via logistic regression: outcome ~ X1 + X2</span></span></code></pre></div>
+<p>Another method is to use the <code>split_pilot_set</code> function,
+which allows the user to split the pilot set (and examine the balance)
+before passing the result to <code>auto_stratify</code> to fit the
+prognostic score.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mysplit <span class="ot">&lt;-</span> <span class="fu">split_pilot_set</span>(mydata, <span class="st">&quot;treat&quot;</span>, <span class="at">group_by_covariates =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;B2&quot;</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Constructing a pilot set by subsampling 10% of controls.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Subsampling while balancing on:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; C1, B2</span></span></code></pre></div>
+<p>The result, <code>mysplit</code>, is a list containing a
+<code>pilot_set</code> and an <code>analysis_set</code>, in this case
+partitioned while balancing on B1 and C2. At this point, we might pass
+the result to <code>auto_stratify</code> as follows:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a.strat2 <span class="ot">&lt;-</span> <span class="fu">auto_stratify</span>(mysplit<span class="sc">$</span>analysis_set, <span class="st">&quot;treat&quot;</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">prognosis =</span> outcome <span class="sc">~</span> X1 <span class="sc">+</span> X2,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">pilot_sample =</span> mysplit<span class="sc">$</span>pilot_set, <span class="at">size =</span> <span class="dv">500</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Using user-specified set for prognostic score modeling.</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Fitting prognostic model via logistic regression: outcome ~ X1 + X2</span></span></code></pre></div>
+<p>In this case, the pilot set splitting method is the same for
+<code>a.strat1</code> and <code>a.strat2</code>, so each should be
+qualitatively similar.</p>
 </div>
 <div id="fitting-the-prognostic-model" class="section level1">
 <h1>Fitting the prognostic model</h1>
-<p>By default, <code>auto_stratify</code> uses a logistic regression (for binary outcomes) or a linear regression (for continuous outcomes) to fit the prognostic model. <code>auto_stratify</code> is built to accomodate other prognostic score estimation approaches: rather than letting <code>auto_stratify</code> do the model fitting, the user can specify a pre-fit model or a vector of prognostic scores.</p>
-<p>A word of caution is advisable: Logistic regression is generally the norm when fitting propensity scores (<span class="citation">Stuart (2010)</span>), and most studies discussing the prognostic score have likewise focused on linear or logistic regression (<span class="citation">Hansen (2008)</span>, <span class="citation">Leacy and Stuart (2014)</span>, <span class="citation">Aikens et al. (2020)</span>), or less commonly the lasso (<span class="citation">Antonelli et al. (2018)</span>). The nuances of modeling and checking the fit of the prognostic score are still understudied. In particular, prognostic models generally are fit on only control observations, meaning that they must necessarily extrapolate to the treatment group. Users should, as always, consider diagnostics for their specific model, for their stratified data set (see “Intro to statamatch”), and for their matched dataset (see, as an introduction <span class="citation">Stuart (2010)</span>). Additionally, in order to maintain the integrity of the pilot set and prevent over-fitting, users interested in trying many modeling or matching schemes are encouraged to define a single pilot/analysis set split (e.g. with <code>split_pilot_set</code>, above) and use the same pilot set throughout their design process.</p>
-<p>To an extent, any prognostic score stratification – even on a poor quality model – will increase the speed of matching for large datasets. In addition, if the strata are sufficiently large, the subsequent within-strata matching step may compensate for a poor-quality prognostic model. To one view, the diagnostic check that matters most is the quality of the final matching result, whereas specific prognostic modeling concerns are perhaps secondary. Nonetheless, simulation and theory results suggest that incorporating a prognostic score into a study design (in combination, generally, with a propensity score) can have favorable statistical properties, such as decreasing variance, increasing power in gamma sensitivity analyses, and decreasing dependence on the propensity score (<span class="citation">Stuart (2010)</span>, <span class="citation">Aikens, Greaves, and Baiocchi (2020)</span>, <span class="citation">Antonelli et al. (2018)</span>, <span class="citation">Hansen (2008)</span>). To that end, prognostic models which produce high-quality prognostic score estimates are expected to ultimately produce higher quality designs by improving the prognostic balance of the matched set.</p>
-<p>This section contains a few examples to introduce users who may be new to the modeling space. By no means does it begin to cover all of the modeling possibilities, or even all of the nuances of any one model. This is not a tutorial on predictive modeling. Users looking to become more familiar with modeling in R more broadly may be interested in the <a href="https://CRAN.R-project.org/package=caret"><code>caret</code></a> package (<span class="citation">Kuhn (2021)</span>), which implements support for a wide variety of predictive models.</p>
+<p>By default, <code>auto_stratify</code> uses a logistic regression
+(for binary outcomes) or a linear regression (for continuous outcomes)
+to fit the prognostic model. <code>auto_stratify</code> is built to
+accomodate other prognostic score estimation approaches: rather than
+letting <code>auto_stratify</code> do the model fitting, the user can
+specify a pre-fit model or a vector of prognostic scores.</p>
+<p>A word of caution is advisable: Logistic regression is generally the
+norm when fitting propensity scores (<span class="citation">Stuart
+(2010)</span>), and most studies discussing the prognostic score have
+likewise focused on linear or logistic regression (<span class="citation">Ben B. Hansen (2008)</span>, <span class="citation">Leacy and Stuart (2014)</span>, <span class="citation">Aikens et al. (2020)</span>), or less commonly the
+lasso (<span class="citation">Antonelli et al. (2018)</span>). The
+nuances of modeling and checking the fit of the prognostic score are
+still understudied. In particular, prognostic models generally are fit
+on only control observations, meaning that they must necessarily
+extrapolate to the treatment group. Users should, as always, consider
+diagnostics for their specific model, for their stratified data set (see
+“Intro to statamatch”), and for their matched dataset (see, as an
+introduction <span class="citation">Stuart (2010)</span>). Additionally,
+in order to maintain the integrity of the pilot set and prevent
+over-fitting, users interested in trying many modeling or matching
+schemes are encouraged to define a single pilot/analysis set split
+(e.g. with <code>split_pilot_set</code>, above) and use the same pilot
+set throughout their design process.</p>
+<p>To an extent, any prognostic score stratification – even on a poor
+quality model – will increase the speed of matching for large datasets.
+In addition, if the strata are sufficiently large, the subsequent
+within-strata matching step may compensate for a poor-quality prognostic
+model. To one view, the diagnostic check that matters most is the
+quality of the final matching result, whereas specific prognostic
+modeling concerns are perhaps secondary. Nonetheless, simulation and
+theory results suggest that incorporating a prognostic score into a
+study design (in combination, generally, with a propensity score) can
+have favorable statistical properties, such as decreasing variance,
+increasing power in gamma sensitivity analyses, and decreasing
+dependence on the propensity score (<span class="citation">Stuart
+(2010)</span>, <span class="citation">Aikens, Greaves, and Baiocchi
+(2020)</span>, <span class="citation">Antonelli et al. (2018)</span>,
+<span class="citation">Ben B. Hansen (2008)</span>). To that end,
+prognostic models which produce high-quality prognostic score estimates
+are expected to ultimately produce higher quality designs by improving
+the prognostic balance of the matched set.</p>
+<p>This section contains a few examples to introduce users who may be
+new to the modeling space. By no means does it begin to cover all of the
+modeling possibilities, or even all of the nuances of any one model.
+This is not a tutorial on predictive modeling. Users looking to become
+more familiar with modeling in R more broadly may be interested in the
+<a href="https://CRAN.R-project.org/package=caret"><code>caret</code></a>
+package (<span class="citation">Kuhn (2021)</span>), which implements
+support for a wide variety of predictive models.</p>
 <div id="outcomes-binary-or-continuous" class="section level2">
 <h2>Outcomes: Binary or Continuous</h2>
-<p>It’s important to select a model which is appropriate to the nature of the outcome of interest. In this tutorial, our sample data has a binary outcome, so we use models appropriate to that outcome. Users with continuous outcomes should use regression models appropriate to continuous outcomes. Other types of outcomes – such as categorical – have not yet been characterized in the prognostic score literature.</p>
+<p>It’s important to select a model which is appropriate to the nature
+of the outcome of interest. In this tutorial, our sample data has a
+binary outcome, so we use models appropriate to that outcome. Users with
+continuous outcomes should use regression models appropriate to
+continuous outcomes. Other types of outcomes – such as categorical –
+have not yet been characterized in the prognostic score literature.</p>
 </div>
 <div id="a-lasso" class="section level2">
 <h2>A lasso</h2>
-<p>The lasso is a sparsifying linear model – it is a mathematical cousin to linear regression, but it functions well when a substaintial number of the measured covariates are actually uninformative to the outcome. This may be a particularly useful and intuitive approach when there are many measured covariates which may be redundant or uninformative.</p>
-<p>The code below uses the <code>glmnet</code> package (<span class="citation">Friedman, Hastie, and Tibshirani (2010)</span>) to fit a cross-validated lasso on the pilot set based on all the measured covariates. In this example, since the outcome is binary, we will run a logistic lasso. This is done by specifying the <code>family = &quot;binomial&quot;</code> argument to <code>cv.glmnet</code> (although other modeling steps are simular for continuous outcomes.)</p>
-<p>The code below does some preprocessing to convert the pilot set data to the right format before passing it to <code>cv.glmnet</code>. <code>glmnet</code> expects the input data to be a model matrix rather than a data frame, and it expects outcomes (<code>y_pilot</code>) to be separated from the covariate data (<code>x_pilot</code>).</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">library</span>(glmnet)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; Loading required package: Matrix</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; Loaded glmnet 4.0</span></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co"># fit model on pilot set</span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6">x_pilot &lt;-<span class="st"> </span><span class="kw">model.matrix</span>(outcome <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>B1 <span class="op">+</span><span class="st"> </span>B2 <span class="op">+</span><span class="st"> </span>C1,</a>
-<a class="sourceLine" id="cb5-7" data-line-number="7">                        <span class="dt">data =</span> mysplit<span class="op">$</span>pilot_set)</a>
-<a class="sourceLine" id="cb5-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb5-9" data-line-number="9">y_pilot &lt;-<span class="st"> </span>mysplit<span class="op">$</span>pilot_set <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(outcome) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="st">  </span><span class="kw">as.matrix</span>()</a>
-<a class="sourceLine" id="cb5-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb5-13" data-line-number="13">cvlasso &lt;-<span class="st"> </span><span class="kw">cv.glmnet</span>(x_pilot, y_pilot, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>)</a></code></pre></div>
-<p>At this point, we can run diagnostics on <code>cvlasso</code>. The <a href="https://glmnet.stanford.edu/articles/glmnet.html">Introduction to glmnet</a> vignette contains an accessible starting point. In this simulated data, we happen to know that the only variable that actually affects the outcome is <code>X1</code>. The sparsifying model often does a great job of picking out <code>X1</code> as the most important variable. We can see this by printing the coefficients:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">coef</span>(cvlasso)</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt; 8 x 1 sparse Matrix of class &quot;dgCMatrix&quot;</span></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt;                       1</span></a>
-<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt; (Intercept)  0.02870109</span></a>
-<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt; (Intercept)  .         </span></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt; X1          -0.64374310</span></a>
-<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; X2           .         </span></a>
-<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt; B1           .         </span></a>
-<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt; B2           .         </span></a>
-<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">#&gt; C1b          .         </span></a>
-<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="co">#&gt; C1c          .</span></a></code></pre></div>
-<p>When we are satisfied with our prognostic model, we can estimate the scores on the analysis set with <code>predict</code> and pass the result to <code>auto_stratify</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># estimate scores on analysis set</span></a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">x_analysis &lt;-<span class="st"> </span><span class="kw">model.matrix</span>(outcome <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>B1 <span class="op">+</span><span class="st"> </span>B2 <span class="op">+</span><span class="st"> </span>C1,</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">                        <span class="dt">data =</span> mysplit<span class="op">$</span>analysis_set)</a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">lasso_scores &lt;-<span class="st"> </span><span class="kw">predict</span>(cvlasso, <span class="dt">newx =</span> x_analysis, <span class="dt">s =</span> <span class="st">&quot;lambda.min&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)</a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co"># pass the scores to auto_stratify</span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8">a.strat_lasso &lt;-<span class="st"> </span><span class="kw">auto_stratify</span>(<span class="dt">data =</span> mysplit<span class="op">$</span>analysis_set,</a>
-<a class="sourceLine" id="cb7-9" data-line-number="9">                             <span class="dt">treat =</span> <span class="st">&quot;treat&quot;</span>,</a>
-<a class="sourceLine" id="cb7-10" data-line-number="10">                             <span class="dt">outcome =</span> <span class="st">&quot;outcome&quot;</span>,</a>
-<a class="sourceLine" id="cb7-11" data-line-number="11">                             <span class="dt">prognosis =</span> lasso_scores,</a>
-<a class="sourceLine" id="cb7-12" data-line-number="12">                             <span class="dt">pilot_sample =</span> mysplit<span class="op">$</span>pilot_set,</a>
-<a class="sourceLine" id="cb7-13" data-line-number="13">                             <span class="dt">size =</span> <span class="dv">500</span>)</a></code></pre></div>
+<p>The lasso is a sparsifying linear model – it is a mathematical cousin
+to linear regression, but it functions well when a substaintial number
+of the measured covariates are actually uninformative to the outcome.
+This may be a particularly useful and intuitive approach when there are
+many measured covariates which may be redundant or uninformative.</p>
+<p>The code below uses the <code>glmnet</code> package (<span class="citation">Friedman, Hastie, and Tibshirani (2010)</span>) to fit
+a cross-validated lasso on the pilot set based on all the measured
+covariates. In this example, since the outcome is binary, we will run a
+logistic lasso. This is done by specifying the
+<code>family = &quot;binomial&quot;</code> argument to <code>cv.glmnet</code>
+(although other modeling steps are simular for continuous outcomes.)</p>
+<p>The code below does some preprocessing to convert the pilot set data
+to the right format before passing it to <code>cv.glmnet</code>.
+<code>glmnet</code> expects the input data to be a model matrix rather
+than a data frame, and it expects outcomes (<code>y_pilot</code>) to be
+separated from the covariate data (<code>x_pilot</code>).</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Loading required package: Matrix</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Loaded glmnet 4.1-3</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># fit model on pilot set</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>x_pilot <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(outcome <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> B1 <span class="sc">+</span> B2 <span class="sc">+</span> C1,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> mysplit<span class="sc">$</span>pilot_set)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>y_pilot <span class="ot">&lt;-</span> mysplit<span class="sc">$</span>pilot_set <span class="sc">%&gt;%</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(outcome) <span class="sc">%&gt;%</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>cvlasso <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(x_pilot, y_pilot, <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>)</span></code></pre></div>
+<p>At this point, we can run diagnostics on <code>cvlasso</code>. The <a href="https://glmnet.stanford.edu/articles/glmnet.html">Introduction to
+glmnet</a> vignette contains an accessible starting point. In this
+simulated data, we happen to know that the only variable that actually
+affects the outcome is <code>X1</code>. The sparsifying model often does
+a great job of picking out <code>X1</code> as the most important
+variable. We can see this by printing the coefficients:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(cvlasso)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8 x 1 sparse Matrix of class &quot;dgCMatrix&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                      s1</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Intercept)  0.02870109</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Intercept)  .         </span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; X1          -0.64374310</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; X2           .         </span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; B1           .         </span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; B2           .         </span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; C1b          .         </span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; C1c          .</span></span></code></pre></div>
+<p>When we are satisfied with our prognostic model, we can estimate the
+scores on the analysis set with <code>predict</code> and pass the result
+to <code>auto_stratify</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># estimate scores on analysis set</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>x_analysis <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(outcome <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> B1 <span class="sc">+</span> B2 <span class="sc">+</span> C1,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> mysplit<span class="sc">$</span>analysis_set)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>lasso_scores <span class="ot">&lt;-</span> <span class="fu">predict</span>(cvlasso, <span class="at">newx =</span> x_analysis, <span class="at">s =</span> <span class="st">&quot;lambda.min&quot;</span>, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># pass the scores to auto_stratify</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>a.strat_lasso <span class="ot">&lt;-</span> <span class="fu">auto_stratify</span>(<span class="at">data =</span> mysplit<span class="sc">$</span>analysis_set,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                             <span class="at">treat =</span> <span class="st">&quot;treat&quot;</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                             <span class="at">outcome =</span> <span class="st">&quot;outcome&quot;</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                             <span class="at">prognosis =</span> lasso_scores,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                             <span class="at">pilot_sample =</span> mysplit<span class="sc">$</span>pilot_set,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                             <span class="at">size =</span> <span class="dv">500</span>)</span></code></pre></div>
 </div>
 <div id="an-elastic-net" class="section level2">
 <h2>An elastic net</h2>
-<p>An elastic net is a fairly straightforward extension of the code above – we can use the same form of the pilot set data that we used above. An additional task is to select the <code>alpha</code> “mixing” parameter determining the amount of L2-regularization (1 for lasso, 0 for ridge regression). Here, I set <code>alpha = 0.2</code>. The tutorial for <code>glmnet</code> also contains some advice for selecting the alpha parameter via cross-validation. As above, we specify a logistic elastic net with <code>family = &quot;binomial&quot;</code>, since in this case our outcome is binary.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">cvenet &lt;-<span class="st"> </span><span class="kw">cv.glmnet</span>(x_pilot, y_pilot, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>, <span class="dt">alpha =</span> <span class="fl">0.2</span>)</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb8-3" data-line-number="3">enet_scores &lt;-<span class="st"> </span><span class="kw">predict</span>(cvenet, <span class="dt">newx =</span> x_analysis, <span class="dt">s =</span> <span class="st">&quot;lambda.min&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)</a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co"># pass the scores to auto_stratify</span></a>
-<a class="sourceLine" id="cb8-6" data-line-number="6">a.strat_enet &lt;-<span class="st"> </span><span class="kw">auto_stratify</span>(<span class="dt">data =</span> mysplit<span class="op">$</span>analysis_set,</a>
-<a class="sourceLine" id="cb8-7" data-line-number="7">                             <span class="dt">treat =</span> <span class="st">&quot;treat&quot;</span>,</a>
-<a class="sourceLine" id="cb8-8" data-line-number="8">                             <span class="dt">outcome =</span> <span class="st">&quot;outcome&quot;</span>,</a>
-<a class="sourceLine" id="cb8-9" data-line-number="9">                             <span class="dt">prognosis =</span> enet_scores,</a>
-<a class="sourceLine" id="cb8-10" data-line-number="10">                             <span class="dt">pilot_sample =</span> mysplit<span class="op">$</span>pilot_set,</a>
-<a class="sourceLine" id="cb8-11" data-line-number="11">                             <span class="dt">size =</span> <span class="dv">500</span>)</a></code></pre></div>
+<p>An elastic net is a fairly straightforward extension of the code
+above – we can use the same form of the pilot set data that we used
+above. An additional task is to select the <code>alpha</code> “mixing”
+parameter determining the amount of L2-regularization (1 for lasso, 0
+for ridge regression). Here, I set <code>alpha = 0.2</code>. The
+tutorial for <code>glmnet</code> also contains some advice for selecting
+the alpha parameter via cross-validation. As above, we specify a
+logistic elastic net with <code>family = &quot;binomial&quot;</code>, since in
+this case our outcome is binary.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cvenet <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(x_pilot, y_pilot, <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>enet_scores <span class="ot">&lt;-</span> <span class="fu">predict</span>(cvenet, <span class="at">newx =</span> x_analysis, <span class="at">s =</span> <span class="st">&quot;lambda.min&quot;</span>, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># pass the scores to auto_stratify</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>a.strat_enet <span class="ot">&lt;-</span> <span class="fu">auto_stratify</span>(<span class="at">data =</span> mysplit<span class="sc">$</span>analysis_set,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">treat =</span> <span class="st">&quot;treat&quot;</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>                             <span class="at">outcome =</span> <span class="st">&quot;outcome&quot;</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                             <span class="at">prognosis =</span> enet_scores,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                             <span class="at">pilot_sample =</span> mysplit<span class="sc">$</span>pilot_set,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>                             <span class="at">size =</span> <span class="dv">500</span>)</span></code></pre></div>
 </div>
 <div id="a-random-forest" class="section level2">
 <h2>A random forest</h2>
-<p>Random forests are a popular option for both classification and regression modeling, particularly because of their strengths in modeling nonlinear relationships in the data. Below is an example which fits a random forest for our binary outcome using <code>randomForest</code>. A note for users with binary outcomes: <code>randomForest</code> will run regression by default if the outcome column is numeric. To circumvent this (e.g. for 0/1 coded data), the outcome can be cast as a factor.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">library</span>(randomForest)</a>
-<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; randomForest 4.6-14</span></a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt; Type rfNews() to see new features/changes/bug fixes.</span></a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt; Attaching package: 'randomForest'</span></a>
-<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></a>
-<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt;     combine</span></a>
-<a class="sourceLine" id="cb9-9" data-line-number="9">forest &lt;-<span class="st"> </span><span class="kw">randomForest</span>(<span class="kw">as.factor</span>(outcome) <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>B1 <span class="op">+</span><span class="st"> </span>B2, <span class="dt">data =</span> mysplit<span class="op">$</span>pilot_set)</a></code></pre></div>
-<p>Random forests can be somewhat more opaque than linear models in terms of understanding how predictions are made. A good starting point is running <code>importance(forest)</code> to check on which features are weighted heavily in the model.</p>
-<p>Below, we extract a “prognostic score” from the random forest. Another note for users with binary outcomes: The <code>predict</code> method for random forest classifiers outputs 0/1 predictions by default. These will be useless for stratification. Instead, we need to specify <code>type = &quot;prob&quot;</code> in the call to predict and extract the probabilities for the “positive” outcome class.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">forest_scores &lt;-<span class="st"> </span><span class="kw">predict</span>(forest,</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2">                         <span class="dt">newdata =</span> mysplit<span class="op">$</span>analysis_set,</a>
-<a class="sourceLine" id="cb10-3" data-line-number="3">                         <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>)[,<span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb10-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb10-5" data-line-number="5">a.strat_forest &lt;-<span class="st"> </span><span class="kw">auto_stratify</span>(<span class="dt">data =</span> mysplit<span class="op">$</span>analysis_set,</a>
-<a class="sourceLine" id="cb10-6" data-line-number="6">                             <span class="dt">treat =</span> <span class="st">&quot;treat&quot;</span>,</a>
-<a class="sourceLine" id="cb10-7" data-line-number="7">                             <span class="dt">outcome =</span> <span class="st">&quot;outcome&quot;</span>,</a>
-<a class="sourceLine" id="cb10-8" data-line-number="8">                             <span class="dt">prognosis =</span> forest_scores,</a>
-<a class="sourceLine" id="cb10-9" data-line-number="9">                             <span class="dt">pilot_sample =</span> mysplit<span class="op">$</span>pilot_set,</a>
-<a class="sourceLine" id="cb10-10" data-line-number="10">                             <span class="dt">size =</span> <span class="dv">500</span>)</a></code></pre></div>
+<p>Random forests are a popular option for both classification and
+regression modeling, particularly because of their strengths in modeling
+nonlinear relationships in the data. Below is an example which fits a
+random forest for our binary outcome using <code>randomForest</code>. A
+note for users with binary outcomes: <code>randomForest</code> will run
+regression by default if the outcome column is numeric. To circumvent
+this (e.g. for 0/1 coded data), the outcome can be cast as a factor.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(randomForest)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; randomForest 4.7-1</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Type rfNews() to see new features/changes/bug fixes.</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;randomForest&#39;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:dplyr&#39;:</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     combine</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>forest <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(<span class="fu">as.factor</span>(outcome) <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> B1 <span class="sc">+</span> B2, <span class="at">data =</span> mysplit<span class="sc">$</span>pilot_set)</span></code></pre></div>
+<p>Random forests can be somewhat more opaque than linear models in
+terms of understanding how predictions are made. A good starting point
+is running <code>importance(forest)</code> to check on which features
+are weighted heavily in the model.</p>
+<p>Below, we extract a “prognostic score” from the random forest.
+Another note for users with binary outcomes: The <code>predict</code>
+method for random forest classifiers outputs 0/1 predictions by default.
+These will be useless for stratification. Instead, we need to specify
+<code>type = &quot;prob&quot;</code> in the call to predict and extract the
+probabilities for the “positive” outcome class.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>forest_scores <span class="ot">&lt;-</span> <span class="fu">predict</span>(forest,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">newdata =</span> mysplit<span class="sc">$</span>analysis_set,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>)[,<span class="dv">1</span>]</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>a.strat_forest <span class="ot">&lt;-</span> <span class="fu">auto_stratify</span>(<span class="at">data =</span> mysplit<span class="sc">$</span>analysis_set,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">treat =</span> <span class="st">&quot;treat&quot;</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">outcome =</span> <span class="st">&quot;outcome&quot;</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>                             <span class="at">prognosis =</span> forest_scores,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                             <span class="at">pilot_sample =</span> mysplit<span class="sc">$</span>pilot_set,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                             <span class="at">size =</span> <span class="dv">500</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="alternative-matching-schemes" class="section level1">
 <h1>Alternative matching schemes</h1>
-<p>“Intro to Stratamatch” covers only the default functionality of <code>stratamatch</code>, which is a fixed 1:k propensity score match within strata. This tutorial covers some alternative options. Note that the examples that follow all require the R package <code>optmatch</code> (<span class="citation">Hansen and Klopfer (2006)</span>) to be installed.</p>
+<p>“Intro to Stratamatch” covers only the default functionality of
+<code>stratamatch</code>, which is a fixed 1:k propensity score match
+within strata. This tutorial covers some alternative options. Note that
+the examples that follow all require the R package <code>optmatch</code>
+(<span class="citation">Ben B. Hansen and Klopfer (2006)</span>) to be
+installed.</p>
 <div id="distance-measure-mahalanobis-distance" class="section level2">
 <h2>Distance measure: Mahalanobis Distance</h2>
-<p>Users can opt to use Mahalanobis distance rather then propensity score for the within-strata matching step by specifying the “method” to <code>strata_match</code>. We set <code>k = 2</code>, so that precisely 2 control observations are matched to each treated observation.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">mahalmatch &lt;-<span class="st"> </span><span class="kw">strata_match</span>(a.strat2, <span class="dt">model =</span> treat <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>B1 <span class="op">+</span><span class="st"> </span>B2,</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2">                           <span class="dt">method =</span> <span class="st">&quot;mahal&quot;</span>, <span class="dt">k =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="kw">summary</span>(mahalmatch)</a></code></pre></div>
+<p>Users can opt to use Mahalanobis distance rather then propensity
+score for the within-strata matching step by specifying the “method” to
+<code>strata_match</code>. We set <code>k = 2</code>, so that precisely
+2 control observations are matched to each treated observation.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>mahalmatch <span class="ot">&lt;-</span> <span class="fu">strata_match</span>(a.strat2, <span class="at">model =</span> treat <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> B1 <span class="sc">+</span> B2,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">method =</span> <span class="st">&quot;mahal&quot;</span>, <span class="at">k =</span> <span class="dv">2</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Using Mahalanobis distance: treat ~ X1 + X2 + B1 + B2</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mahalmatch)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Structure of matched sets:</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  1:2  0:1 </span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1146 1176 </span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Effective Sample Size:  1528 </span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (equivalent number of matched pairs).</span></span></code></pre></div>
 </div>
 <div id="matching-procedure-full-matching" class="section level2">
 <h2>Matching procedure: Full Matching</h2>
-<p>Full matching may be a particularly useful approach when the ratio of treated to control individuals varies within strata, but the researcher still would prefer to use as much of the data as possible. To do full matching, set <code>k = &quot;full&quot;</code>. This can be used in combination with mahalanobis distance matching, as shown below:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">fullmahalmatch &lt;-<span class="st"> </span><span class="kw">strata_match</span>(a.strat2, <span class="dt">model =</span> treat <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>B1 <span class="op">+</span><span class="st"> </span>B2,</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2">                           <span class="dt">method =</span> <span class="st">&quot;mahal&quot;</span>, <span class="dt">k =</span> <span class="st">&quot;full&quot;</span>)</a>
-<a class="sourceLine" id="cb12-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="kw">summary</span>(fullmahalmatch)</a></code></pre></div>
+<p>Full matching may be a particularly useful approach when the ratio of
+treated to control individuals varies within strata, but the researcher
+still would prefer to use as much of the data as possible. To do full
+matching, set <code>k = &quot;full&quot;</code>. This can be used in combination
+with mahalanobis distance matching, as shown below:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fullmahalmatch <span class="ot">&lt;-</span> <span class="fu">strata_match</span>(a.strat2, <span class="at">model =</span> treat <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> B1 <span class="sc">+</span> B2,</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">method =</span> <span class="st">&quot;mahal&quot;</span>, <span class="at">k =</span> <span class="st">&quot;full&quot;</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Using Mahalanobis distance: treat ~ X1 + X2 + B1 + B2</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fullmahalmatch)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Structure of matched sets:</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5+:1  4:1  3:1  2:1  1:1  1:2  1:3  1:4 1:5+ </span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    8    6   14   42  453  132   84   70  206 </span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Effective Sample Size:  1331.8 </span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (equivalent number of matched pairs).</span></span></code></pre></div>
 </div>
 <div id="matching-with-other-software" class="section level2">
 <h2>Matching with other software</h2>
-<p><code>stratamatch</code> doesn’t natively support all possible matching schemes. Luckily, it can be fairly straightforward to stratify a data set with <code>auto_stratify</code> and match the results with other software. As an example, the code below uses the <code>optmatch</code> package (<span class="citation">Hansen and Klopfer (2006)</span>) to match within-strata using Mahalanobis distance with a propensity score caliper.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">library</span>(optmatch)</a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="co"># mahalanobis distance matrix for within-strata matching</span></a>
-<a class="sourceLine" id="cb13-4" data-line-number="4">mahaldist &lt;-<span class="st"> </span><span class="kw">match_on</span>(treat <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>B1 <span class="op">+</span><span class="st"> </span>B2, </a>
-<a class="sourceLine" id="cb13-5" data-line-number="5">                      <span class="dt">within =</span> <span class="kw">exactMatch</span>(treat <span class="op">~</span><span class="st"> </span>stratum,</a>
-<a class="sourceLine" id="cb13-6" data-line-number="6">                                          <span class="dt">data =</span> a.strat2<span class="op">$</span>analysis_set),</a>
-<a class="sourceLine" id="cb13-7" data-line-number="7">                      <span class="dt">data =</span> a.strat2<span class="op">$</span>analysis_set)</a>
-<a class="sourceLine" id="cb13-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb13-9" data-line-number="9"><span class="co"># add propensity score caliper</span></a>
-<a class="sourceLine" id="cb13-10" data-line-number="10">propdist &lt;-<span class="st"> </span><span class="kw">match_on</span>(<span class="kw">glm</span>(treat <span class="op">~</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>X2 <span class="op">+</span><span class="st"> </span>B1 <span class="op">+</span><span class="st"> </span>B2,</a>
-<a class="sourceLine" id="cb13-11" data-line-number="11">                         <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>,</a>
-<a class="sourceLine" id="cb13-12" data-line-number="12">                         <span class="dt">data =</span> a.strat2<span class="op">$</span>analysis_set))</a>
-<a class="sourceLine" id="cb13-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb13-14" data-line-number="14">mahalcaliper &lt;-<span class="st"> </span>mahaldist <span class="op">+</span><span class="st"> </span><span class="kw">caliper</span>(propdist, <span class="dt">width =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb13-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb13-16" data-line-number="16">mahalcaliper_match &lt;-<span class="st"> </span><span class="kw">pairmatch</span>(mahalcaliper, <span class="dt">data =</span> a.strat2<span class="op">$</span>analysis_set)</a>
-<a class="sourceLine" id="cb13-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb13-18" data-line-number="18"><span class="kw">summary</span>(mahalcaliper_match)</a></code></pre></div>
+<p><code>stratamatch</code> doesn’t natively support all possible
+matching schemes. Luckily, it can be fairly straightforward to stratify
+a data set with <code>auto_stratify</code> and match the results with
+other software. As an example, the code below uses the
+<code>optmatch</code> package (<span class="citation">Ben B. Hansen and
+Klopfer (2006)</span>) to match within-strata using Mahalanobis distance
+with a propensity score caliper.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(optmatch)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Loading required package: survival</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># mahalanobis distance matrix for within-strata matching</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>mahaldist <span class="ot">&lt;-</span> <span class="fu">match_on</span>(treat <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> B1 <span class="sc">+</span> B2, </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">within =</span> <span class="fu">exactMatch</span>(treat <span class="sc">~</span> stratum,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                                          <span class="at">data =</span> a.strat2<span class="sc">$</span>analysis_set),</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>                      <span class="at">data =</span> a.strat2<span class="sc">$</span>analysis_set)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co"># add propensity score caliper</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>propdist <span class="ot">&lt;-</span> <span class="fu">match_on</span>(<span class="fu">glm</span>(treat <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> B1 <span class="sc">+</span> B2,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>                         <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>                         <span class="at">data =</span> a.strat2<span class="sc">$</span>analysis_set))</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>mahalcaliper <span class="ot">&lt;-</span> mahaldist <span class="sc">+</span> <span class="fu">caliper</span>(propdist, <span class="at">width =</span> <span class="dv">1</span>)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>mahalcaliper_match <span class="ot">&lt;-</span> <span class="fu">pairmatch</span>(mahalcaliper, <span class="at">data =</span> a.strat2<span class="sc">$</span>analysis_set)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in fullmatch.BlockedInfinitySparseMatrix(x = x, min.controls = controls, : At least one subproblem matching failed.</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  (Restrictions impossible to meet?)</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Enter ?matchfailed for more info.</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mahalcaliper_match)</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Matches made in 8 of 10 subgroups, accounting for 3691 of 4614 total observations.</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Structure of matched sets:</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  1:0  1:1  0:1 </span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  192  954 2514 </span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Effective Sample Size:  954 </span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (equivalent number of matched pairs).</span></span></code></pre></div>
 </div>
 </div>
 <div id="references" class="section level1 unnumbered">
-<h1>References</h1>
-<div id="refs" class="references">
-<div id="ref-aikens2020pilot">
-<p>Aikens, Rachael C, Dylan Greaves, and Michael Baiocchi. 2020. “A Pilot Design for Observational Studies: Using Abundant Data Thoughtfully.” <em>Statistics in Medicine</em>. Wiley Online Library.</p>
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-aikens2020pilot" class="csl-entry">
+Aikens, Rachael C, Dylan Greaves, and Michael Baiocchi. 2020. <span>“A
+Pilot Design for Observational Studies: Using Abundant Data
+Thoughtfully.”</span> <em>Statistics in Medicine</em>.
 </div>
-<div id="ref-aikens2020stratified">
-<p>Aikens, Rachael C, Joseph Rigdon, Justin Lee, Michael Baiocchi, Andrew B Goldstone, Peter Chiu, Y Joseph Woo, and Jonathan H Chen. 2020. “Stratified Pilot Matching in R: The Stratamatch Package.” <em>Statistics arXiv</em>, January. <a href="https://arxiv.org/abs/2001.02775">https://arxiv.org/abs/2001.02775</a>.</p>
+<div id="ref-aikens2020stratified" class="csl-entry">
+Aikens, Rachael C, Joseph Rigdon, Justin Lee, Michael Baiocchi, Andrew B
+Goldstone, Peter Chiu, Y Joseph Woo, and Jonathan H Chen. 2020.
+<span>“Stratified Pilot Matching in r: The Stratamatch Package.”</span>
+<em>Statistics arXiv</em>, January. <a href="https://arxiv.org/abs/2001.02775">https://arxiv.org/abs/2001.02775</a>.
 </div>
-<div id="ref-antonelli2018doubly">
-<p>Antonelli, Joseph, Matthew Cefalu, Nathan Palmer, and Denis Agniel. 2018. “Doubly Robust Matching Estimators for High Dimensional Confounding Adjustment.” <em>Biometrics</em> 74 (4). Wiley Online Library: 1171–9.</p>
+<div id="ref-antonelli2018doubly" class="csl-entry">
+Antonelli, Joseph, Matthew Cefalu, Nathan Palmer, and Denis Agniel.
+2018. <span>“Doubly Robust Matching Estimators for High Dimensional
+Confounding Adjustment.”</span> <em>Biometrics</em> 74 (4): 1171–79.
 </div>
-<div id="ref-friedman2010regularization">
-<p>Friedman, Jerome, Trevor Hastie, and Rob Tibshirani. 2010. “Regularization Paths for Generalized Linear Models via Coordinate Descent.” <em>Journal of Statistical Software</em> 33 (1). NIH Public Access: 1.</p>
+<div id="ref-friedman2010regularization" class="csl-entry">
+Friedman, Jerome, Trevor Hastie, and Rob Tibshirani. 2010.
+<span>“Regularization Paths for Generalized Linear Models via Coordinate
+Descent.”</span> <em>Journal of Statistical Software</em> 33 (1): 1.
 </div>
-<div id="ref-hansen2008prognostic">
-<p>Hansen, Ben B. 2008. “The Prognostic Analogue of the Propensity Score.” <em>Biometrika</em> 95 (2). Oxford University Press: 481–88.</p>
+<div id="ref-hansen2008prognostic" class="csl-entry">
+Hansen, Ben B. 2008. <span>“The Prognostic Analogue of the Propensity
+Score.”</span> <em>Biometrika</em> 95 (2): 481–88.
 </div>
-<div id="ref-hansen2006optmatch">
-<p>Hansen, Ben B., and Stephanie Olsen Klopfer. 2006. “Optimal Full Matching and Related Designs via Network Flows.” <em>Journal of Computational and Graphical Statistics</em> 15 (3): 609–27.</p>
+<div id="ref-hansen2006optmatch" class="csl-entry">
+Hansen, Ben B., and Stephanie Olsen Klopfer. 2006. <span>“Optimal Full
+Matching and Related Designs via Network Flows.”</span> <em>Journal of
+Computational and Graphical Statistics</em> 15 (3): 609–27.
 </div>
-<div id="ref-caret2021">
-<p>Kuhn, Max. 2021. <em>Caret: Classification and Regression Training</em>. <a href="https://CRAN.R-project.org/package=caret">https://CRAN.R-project.org/package=caret</a>.</p>
+<div id="ref-caret2021" class="csl-entry">
+Kuhn, Max. 2021. <em>Caret: Classification and Regression Training</em>.
+<a href="https://CRAN.R-project.org/package=caret">https://CRAN.R-project.org/package=caret</a>.
 </div>
-<div id="ref-leacy2014joint">
-<p>Leacy, Finbarr P, and Elizabeth A Stuart. 2014. “On the Joint Use of Propensity and Prognostic Scores in Estimation of the Average Treatment Effect on the Treated: A Simulation Study.” <em>Statistics in Medicine</em> 33 (20). Wiley Online Library: 3488–3508.</p>
+<div id="ref-leacy2014joint" class="csl-entry">
+Leacy, Finbarr P, and Elizabeth A Stuart. 2014. <span>“On the Joint Use
+of Propensity and Prognostic Scores in Estimation of the Average
+Treatment Effect on the Treated: A Simulation Study.”</span>
+<em>Statistics in Medicine</em> 33 (20): 3488–508.
 </div>
-<div id="ref-stuart2010matching">
-<p>Stuart, Elizabeth A. 2010. “Matching Methods for Causal Inference: A Review and a Look Forward.” <em>Statistical Science: A Review Journal of the Institute of Mathematical Statistics</em> 25 (1). NIH Public Access: 1.</p>
+<div id="ref-stuart2010matching" class="csl-entry">
+Stuart, Elizabeth A. 2010. <span>“Matching Methods for Causal Inference:
+A Review and a Look Forward.”</span> <em>Statistical Science: A Review
+Journal of the Institute of Mathematical Statistics</em> 25 (1): 1.
 </div>
 </div>
 </div>

@@ -92,34 +92,34 @@ a.strat_forest <- auto_stratify(data = mysplit$analysis_set,
 if (!requireNamespace("optmatch", quietly = TRUE)) knitr::opts_chunk$set(eval = FALSE)
 
 ## -----------------------------------------------------------------------------
-#  mahalmatch <- strata_match(a.strat2, model = treat ~ X1 + X2 + B1 + B2,
-#                             method = "mahal", k = 2)
-#  
-#  summary(mahalmatch)
+mahalmatch <- strata_match(a.strat2, model = treat ~ X1 + X2 + B1 + B2,
+                           method = "mahal", k = 2)
+
+summary(mahalmatch)
 
 ## -----------------------------------------------------------------------------
-#  fullmahalmatch <- strata_match(a.strat2, model = treat ~ X1 + X2 + B1 + B2,
-#                             method = "mahal", k = "full")
-#  
-#  summary(fullmahalmatch)
+fullmahalmatch <- strata_match(a.strat2, model = treat ~ X1 + X2 + B1 + B2,
+                           method = "mahal", k = "full")
+
+summary(fullmahalmatch)
 
 ## -----------------------------------------------------------------------------
-#  library(optmatch)
-#  
-#  # mahalanobis distance matrix for within-strata matching
-#  mahaldist <- match_on(treat ~ X1 + X2 + B1 + B2,
-#                        within = exactMatch(treat ~ stratum,
-#                                            data = a.strat2$analysis_set),
-#                        data = a.strat2$analysis_set)
-#  
-#  # add propensity score caliper
-#  propdist <- match_on(glm(treat ~ X1 + X2 + B1 + B2,
-#                           family = "binomial",
-#                           data = a.strat2$analysis_set))
-#  
-#  mahalcaliper <- mahaldist + caliper(propdist, width = 1)
-#  
-#  mahalcaliper_match <- pairmatch(mahalcaliper, data = a.strat2$analysis_set)
-#  
-#  summary(mahalcaliper_match)
+library(optmatch)
+
+# mahalanobis distance matrix for within-strata matching
+mahaldist <- match_on(treat ~ X1 + X2 + B1 + B2, 
+                      within = exactMatch(treat ~ stratum,
+                                          data = a.strat2$analysis_set),
+                      data = a.strat2$analysis_set)
+
+# add propensity score caliper
+propdist <- match_on(glm(treat ~ X1 + X2 + B1 + B2,
+                         family = "binomial",
+                         data = a.strat2$analysis_set))
+
+mahalcaliper <- mahaldist + caliper(propdist, width = 1)
+
+mahalcaliper_match <- pairmatch(mahalcaliper, data = a.strat2$analysis_set)
+
+summary(mahalcaliper_match)
 

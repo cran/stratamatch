@@ -253,7 +253,7 @@ Based on the coefficients from the prognostic model, we can tell that our progno
 
 Now that we have stratified the data, we can match the individuals within each stratum. Note that all of the examples that follow additionally require the R package `optmatch` (@hansen2006optmatch) to be installed.
 
-The most flexible  strategy - although occaisionally more complex - is for the researcher to do this step by hand, using the strata designations in the analysis set returned by either one of the stratification methods. If the researcher plans to do something very specific or nuanced in the matching process, this may be the best approach.  For example, users proficient with the matching package `optmatch` (@hansen2006optmatch) will note that adding `+ strata(stratum)` to the matching formula supplied to optmatch will request that optmatch perform the matching within each stratum in the analysis set (see the [optmatch documentation](https://CRAN.R-project.org/package=optmatch) for further details). Another approach is to divide the `analysis_set` into separate data frames and match on those individually, perhaps distributing over serval computing clusters or using a different matching scheme in each stratum (for example different $k$ in $1:k$ matching)
+The most flexible  strategy - although occasionally more complex - is for the researcher to do this step by hand, using the strata designations in the analysis set returned by either one of the stratification methods. If the researcher plans to do something very specific or nuanced in the matching process, this may be the best approach.  For example, users proficient with the matching package `optmatch` (@hansen2006optmatch) will note that adding `+ strata(stratum)` to the matching formula supplied to optmatch will request that optmatch perform the matching within each stratum in the analysis set (see the [optmatch documentation](https://CRAN.R-project.org/package=optmatch) for further details). Another approach is to divide the `analysis_set` into separate data frames and match on those individually, perhaps distributing over several computing clusters or using a different matching scheme in each stratum (for example different $k$ in $1:k$ matching)
 
 If the goal is something more simple, e.g. a 1-to-1 or 1-to-$k$ optimal propensity score matching within strata, the `strata_match` function can do that automatically.  Below, I match two control individuals to each treatment individual within strata in my analysis set provided by a.strat.  I use the propensity score formula `treat ~ X1 + X2 + B1 + B2`.
 
@@ -269,7 +269,7 @@ mymatch <- strata_match(a.strat, treat ~ X1 + X2 + B1 + B2, k = 1)
 summary(mymatch)
 ```
 
-This function in turn calls `optmatch` to do the matching, stratified by the strata assignments.  It returns an optmatch matching.  Inessence, each individual is given an identification code for its match.  `<NA>` indicates that the individual was not matched, and an identifier such as `3.15` indicates that this individual was in stratum 3 and it was placed in match 15.
+This function in turn calls `optmatch` to do the matching, stratified by the strata assignments.  It returns an optmatch matching.  In essence, each individual is given an identification code for its match.  `<NA>` indicates that the individual was not matched, and an identifier such as `3.15` indicates that this individual was in stratum 3 and it was placed in match 15.
 
 ```{r}
 # add match information as a column in the data set
